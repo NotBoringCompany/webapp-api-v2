@@ -10,6 +10,7 @@ const Moralis = require('moralis-v1/node');
 const parseJSON = require('../../../utils/jsonParser').parseJSON;
 const { getAttackEffectiveness, getDefenseEffectiveness } = require('../../../api-calculations/nbmonTypeEffectiveness');
 const { getNBMonData } = require('../../../api-calculations/nbmonData');
+const { getGenesisFertilityDeduction } = require('../../../api-calculations/genesisNBMonHelper');
 
 // NOTE: The GenesisNBMon contract will only exist in ONE blockchain. This means that there is no need to specify multiple RPC URLs for dynamic interaction.
 // Currently, this RPC URL is set to Cronos Testnet for testing purposes, but it will most likely be on Ethereum.
@@ -142,10 +143,85 @@ const getGenesisNBMon = async (id) => {
         nbmonData['fertility'] = nbmon['numericMetadata'][8] === undefined ? null : nbmon['numericMetadata'][8];
 
         if (nbmonData['rarity'] !== null) {
-            /// FERTILITY DEDUCTION CALCULATION
+            nbmonData['fertilityDeduction'] = getGenesisFertilityDeduction(nbmonData['rarity']);
+        } else {
+            nbmonData['fertilityDeduction'] = null;
         }
 
+        nbmonData['healthPotential'] = nbmon['numericMetadata'][1] === undefined ? null : nbmon['numericMetadata'][1];
+        nbmonData['energyPotential'] = nbmon['numericMetadata'][2] === undefined ? null : nbmon['numericMetadata'][2];
+        nbmonData['attackPotential'] = nbmon['numericMetadata'][3] === undefined ? null : nbmon['numericMetadata'][3];
+        nbmonData['defensePotential'] = nbmon['numericMetadata'][4] === undefined ? null : nbmon['numericMetadata'][4];
+        nbmonData['spAtkPotential'] = nbmon['numericMetadata'][5] === undefined ? null : nbmon['numericMetadata'][5];
+        nbmonData['spDefPotential'] = nbmon['numericMetadata'][6] === undefined ? null : nbmon['numericMetadata'][6];
+        nbmonData['speedPotential'] = nbmon['numericMetadata'][7] === undefined ? null : nbmon['numericMetadata'][7];
+        nbmonData['isEgg'] = nbmon['boolMetadata'][0] === undefined ? false : nbmon['boolMetadata'][0];
+        nbmonData['isListed'] = nbmon['isListed'] === undefined ? false : nbmon['isListed'];
+
+        if (nbmon.isListed) {
+            //////////////////// GET LISTING DATA FUNCTION HERE////////////////////
+            ///If !listingData (listingData === null) -> listing is expired
+			// if (!listingData) {
+			// 	nbmonObj["isListed"] = false;
+
+			// 	// Changes the isListed to be false
+			// 	await changeIsListedStatus(false, id);
+			// 	await deleteItemOnSale(id);
+			// }
+			// nbmonObj = { ...nbmonObj, listingData };
+            ///////////////////////////////////////////////////////////////////////
+        } else {
+            nbmonData['listingData'] = null;
+        }
+
+        ////////////////////////// GET GAME DATA FROM GAMEDATA MORALIS HERE/////////////////////////////////////
+        // nbmonObj["currentExp"] =
+		// 	parsedGdQuery["currentExp"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["currentExp"];
+		// nbmonObj["level"] =
+		// 	parsedGdQuery["level"] === undefined ? null : parsedGdQuery["level"];
+		// nbmonObj["nickname"] =
+		// 	parsedGdQuery["nickname"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["nickname"];
+		// nbmonObj["skillList"] =
+		// 	parsedGdQuery["skillList"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["skillList"];
+		// nbmonObj["maxHpEffort"] =
+		// 	parsedGdQuery["maxHpEffort"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["maxHpEffort"];
+		// nbmonObj["maxEnergyEffort"] =
+		// 	parsedGdQuery["maxEnergyEffort"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["maxEnergyEffort"];
+		// nbmonObj["speedEffort"] =
+		// 	parsedGdQuery["speedEffort"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["speedEffort"];
+		// nbmonObj["attackEffort"] =
+		// 	parsedGdQuery["attackEffort"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["attackEffort"];
+		// nbmonObj["specialAttackEffort"] =
+		// 	parsedGdQuery["specialAttackEffort"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["specialAttackEffort"];
+		// nbmonObj["defenseEffort"] =
+		// 	parsedGdQuery["defenseEffort"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["defenseEffort"];
+		// nbmonObj["specialDefenseEffort"] =
+		// 	parsedGdQuery["specialDefenseEffort"] === undefined
+		// 		? null
+		// 		: parsedGdQuery["specialDefenseEffort"];
+        ///////////////////////////////////////////////////////////////////////////
+
         console.log(nbmonData);
+
+        return nbmonData;
     } catch (err) {
         throw err;
     }
