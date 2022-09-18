@@ -9,6 +9,7 @@ const Moralis = require('moralis-v1/node');
 // IMPORTS
 const parseJSON = require('../../../utils/jsonParser').parseJSON;
 const { getAttackEffectiveness, getDefenseEffectiveness } = require('../../../api-calculations/nbmonTypeEffectiveness');
+const { getNBMonData } = require('../../../api-calculations/nbmonData');
 
 // NOTE: The GenesisNBMon contract will only exist in ONE blockchain. This means that there is no need to specify multiple RPC URLs for dynamic interaction.
 // Currently, this RPC URL is set to Cronos Testnet for testing purposes, but it will most likely be on Ethereum.
@@ -114,6 +115,16 @@ const getGenesisNBMon = async (id) => {
         nbmonData['passives'] = [firstPassive, secondPassive];
         nbmonData['gender'] = nbmon['stringMetadata'][0] === undefined ? null : nbmon['stringMetadata'][0];
         nbmonData['rarity'] = nbmon['stringMetadata'][1] === undefined ? null : nbmon['stringMetadata'][1];
+        nbmonData['species'] = nbmon['stringMetadata'][3] === undefined ? null : nbmon['stringMetadata'][3];
+        nbmonData['genus'] = nbmon['stringMetadata'][4] === undefined ? null : nbmon['stringMetadata'][4];
+
+        let nbpediaData;
+
+        if (nbmonData['genus'] === null) {
+            nbmonData['genusDescription'] = null;
+        } else {
+            nbpediaData = getNBMonData(nbmonData['genus']);
+        }
 
         // mutation calculation
         // checks if nbmon is still an egg
@@ -125,15 +136,16 @@ const getGenesisNBMon = async (id) => {
         } else {
             nbmonData['mutation'] = nbmon['stringMetadata'][2] === 'Not mutated' ? nbmon['stringMetadata'][2] : 'Mutated';
             nbmonData['mutationType'] === nbmonData['mutation'] === 'Mutated' ? nbmon['stringMetadata'][2] : null;
-            ////////////////////////// TO DO: CREATE GENESIS BEHAVIOR CALCULATION //////////////////////////
-            // nbmonObj['behavior'] = await getGenesisBehavior(nbmonObj['genus']);
-            /////////////////////////////////////////////////////////////////////////////////////////////////
+            nbmonData['behavior'] = nbpediaData['behavior'] === undefined ? null : nbpediaData['behavior'];
+        }
+
+        nbmonData['fertility'] = nbmon['numericMetadata'][8] === undefined ? null : nbmon['numericMetadata'][8];
+
+        if (nbmonData['rarity'] !== null) {
+            /// FERTILITY DEDUCTION CALCULATION
         }
 
         console.log(nbmonData);
-
-
-
     } catch (err) {
         throw err;
     }
