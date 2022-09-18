@@ -177,7 +177,16 @@ const getGenesisNBMonOwner = async (id) => {
  */
 const getOwnedGenesisNBMons = async (address) => {
     try {
+        const ownedIDs = await getOwnedGenesisNBMonIDs(address);
         
+        let nbmons = [];
+
+        ownedIDs.forEach(async (id) => {
+            const nbmon = await getGenesisNBMon(id);
+            nbmons.push(nbmon);
+        });
+
+        return nbmons;
     } catch (err) {
         throw err;
     }

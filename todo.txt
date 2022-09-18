@@ -15,3 +15,4 @@ IMPORTANT CHANGES FROM V1 BACKEND:
 1. publicMint (genesisNBMonMinting) now accepts `toAddress` instead of `address` for clarity.
 2. getGenesisNBMonOwner now accepts `id` instead of `nbmonId`.
 3. getOwnerGenesisNBMons is now `getOwnedGenesisNBMons`.
+4. getOwnerGenesisNBMonIDs is now `getOwnedGenesisNBMonIDs`.
