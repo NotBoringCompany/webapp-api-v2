@@ -16,3 +16,4 @@ IMPORTANT CHANGES FROM V1 BACKEND:
 2. getGenesisNBMonOwner now accepts `id` instead of `nbmonId`.
 3. getOwnerGenesisNBMons is now `getOwnedGenesisNBMons`.
 4. getOwnerGenesisNBMonIDs is now `getOwnedGenesisNBMonIDs`.
+5. getGenesisNBMonTypes is now converted into `getNBMonTypes` to accept not just Genesis NBMon queries. It also accepts `genus` instead of `genusParam`.

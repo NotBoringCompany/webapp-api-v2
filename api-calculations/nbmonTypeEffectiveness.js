@@ -42,6 +42,10 @@ const allTypes = [
  */
 const getAttackEffectiveness = async (firstType, secondType) => {
     try {
+        if (firstType === undefined || firstType === null || firstType === '') {
+            throw new Error('Please specify at least the firstType.');
+        }
+
         // if second type is empty, we force it to become null.
         if (secondType === undefined || secondType === null || secondType === '') {
             secondType = null;
@@ -148,6 +152,10 @@ const getAttackEffectiveness = async (firstType, secondType) => {
  */
 const getDefenseEffectiveness = async (firstType, secondType) => {
     try {
+        if (firstType === undefined || firstType === null || firstType === '') {
+            throw new Error('Please specify at least the firstType.');
+        }
+        
         // if second type is empty, we force it to become null.
         if (secondType === undefined || secondType === null || secondType === '') {
             secondType = null;
