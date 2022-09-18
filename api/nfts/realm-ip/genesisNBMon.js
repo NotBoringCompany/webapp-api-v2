@@ -4,6 +4,7 @@ const ethers = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
+const Moralis = require('moralis-v1/node');
 
 // IMPORTS
 const parseJSON = require('../../../utils/jsonParser').parseJSON;
@@ -25,6 +26,10 @@ const genesisContract = new ethers.Contract(
     rpcProvider
 );
 
+const serverUrl = process.env.MORALIS_SERVERURL;
+const appId = process.env.MORALIS_APPID;
+const masterKey = process.env.MORALIS_MASTERKEY;
+
 // FUNCTIONS
 /**
  * `getGenesisNBMon` returns a Genesis NBMon object with all relevant blockchain and non-blockchain data.
@@ -33,9 +38,68 @@ const genesisContract = new ethers.Contract(
  */
 const getGenesisNBMon = async (id) => {
     try {
-        //
+        await Moralis.start({ 
+            serverUrl,
+            appId,
+            masterKey
+        });
+        const GenesisNBMon = new Moralis.Query("MintedNFTs");
+        // we set the query to match the contract address of the Genesis NBMon contract and the specified ID.
+        GenesisNBMon.equalTo("contractAddress", process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        GenesisNBMon.equalTo("tokenId", id);
+
+        const query = await GenesisNBMon.first({ useMasterKey: true });
+
+        // if the query result doesn't return anything, we throw an error.
+        if (query === undefined || query === null || query === "" || query.length === 0) {
+            throw new Error(`No Genesis NBMon found with the specified ID ${id}`);
+        }
+
+
+        // we parse the query to return a readable object.
+        const nbmon = parseJSON(query);
+
+        //////////////// TO DO: QUERY THE GENESIS NBMONS GAMEDATA STUFF HERE //////////////////
+
+        ///////////////////////////////////////////////////////////////////////////////////////
+
+        // we initialize an empty object to store all the Genesis NBMon data.
+        let nbmonData = {};
+
+        nbmonData['nbmonId'] = nbmon['tokenId'];
+        nbmonData['owner'] = nbmon['owner'];
+        nbmonData['bornAt'] = nbmon['bornAt'];
+
+        // calculates if the nbmon is hatchable
+        let now = moment().unix();
+        let hatchableTime = parseInt(Number(nbmon["numericMetadata"][0])) + parseInt(Number(nbmon["bornAt"]));
+
+        // check if isEgg is true or false to return respective hatching metadata
+        if (nbmon['boolMetadata'][0] === true) {
+            nbmonData['hatchedAt'] = null;
+            nbmonData['isHatchable'] = now >= hatchableTime;
+        } else {
+            nbmonData['hatchedAt'] = nbmon['numericMetadata'][9];
+            nbmonData['isHatchable'] = false;
+        }
+
+        nbmonData['transferredAt'] = nbmon['transferredAt'];
+        nbmonData['hatchingDuration'] = nbmon['numericMetadata'][0];
+
+        // the types of the nbmon. will most likely be undefined if the nbmon is an egg.
+        const firstType = nbmon['stringMetadata'][5] === undefined ? null : nbmon['stringMetadata'][5];
+        const secondType = nbmon['stringMetadata'][6] === undefined ? null : nbmon['stringMetadata'][6];
+        
+        nbmonData['types'] = [firstType, secondType];
+
+        console.log(nbmonData);
+
+
+
     } catch (err) {
         throw err;
     }
 }
+
+getGenesisNBMon(1);
 

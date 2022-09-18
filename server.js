@@ -22,5 +22,5 @@ app.listen(port, async() => {
         serverUrl,
         appId,
         masterKey
-     });
+    });
 });

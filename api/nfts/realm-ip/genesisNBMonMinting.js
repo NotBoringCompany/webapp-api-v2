@@ -8,9 +8,6 @@ const moment = require('moment');
 // TO DO: create addToActivities + uploadGenesisEggMetadata and import here
 
 const privateKey = process.env.TEST_ADMIN_PRIVATE_KEY;
-const serverUrl = process.env.MORALIS_SERVERURL;
-const appId = process.env.MORALIS_APPID;
-const masterKey = process.env.MORALIS_MASTERKEY;
 
 const rpcUrl = process.env.CRONOS_RPC_URL;
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
@@ -37,11 +34,6 @@ const genesisContract = new ethers.Contract(
  */
 const publicMint = async (toAddress) => {
     try {
-        await Moralis.start({ 
-            serverUrl,
-            appId,
-            masterKey
-         });
         const signer = new ethers.Wallet(privateKey, rpcProvider);
         
         /// NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
@@ -77,7 +69,7 @@ const publicMint = async (toAddress) => {
 
         mintedNFTs.set("nftName", "Genesis NBMon");
         mintedNFTs.set("contractAddress", genesisContract.address);
-        mintedNFTs.set("nbmonId", mintedId);
+        mintedNFTs.set("tokenId", mintedId);
         mintedNFTs.set("owner", toAddress);
         mintedNFTs.set("stringMetadata", stringMetadata);
         mintedNFTs.set("numericMetadata", numericMetadata);
@@ -111,11 +103,6 @@ const publicMint = async (toAddress) => {
  */
  const whitelistedMint = async (toAddress) => {
     try {
-        await Moralis.start({ 
-            serverUrl,
-            appId,
-            masterKey
-         });
         const signer = new ethers.Wallet(privateKey, rpcProvider);
         
         /// NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
@@ -151,7 +138,7 @@ const publicMint = async (toAddress) => {
 
         mintedNFTs.set("nftName", "Genesis NBMon");
         mintedNFTs.set("contractAddress", genesisContract.address);
-        mintedNFTs.set("nbmonId", mintedId);
+        mintedNFTs.set("tokenId", mintedId);
         mintedNFTs.set("owner", toAddress);
         mintedNFTs.set("stringMetadata", stringMetadata);
         mintedNFTs.set("numericMetadata", numericMetadata);
@@ -175,6 +162,11 @@ const publicMint = async (toAddress) => {
     } catch (err) {
         throw err;
     }
+}
+
+module.exports = {
+    publicMint,
+    whitelistedMint
 }
 
 
