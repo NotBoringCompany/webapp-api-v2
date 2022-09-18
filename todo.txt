@@ -1,10 +1,12 @@
+- create getGenesisBehavior function and import in `getGenesisNBMon`.
 - Create addToActivities, import to genesisNBMonMinting API
 - Create uploadGenesisEggMetadata, import to genesisNBMonMinting API
 - declare uploadGenesisEggMetadata and addToActivities in `publicMint`
 - create genesisNBmonsGameData class in moralis and save the nbmon in this class after saving it to GenesisNBMons in the `publicMint` function
 - Create an emergency check for GenesisNBMons class in Moralis (just in case some minted NBMons are not added so that it can manually be added to the Moralis DB).
 - Change hatching duration in `publicMint` for proper production.
-- change genesis testing contract to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
+- IMPORTANT: change genesis testing contract to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
+and in `getGenesisNBMonOwner` etc where querying in Moralis is needed.
 - remove console.logs (later on)
 
 

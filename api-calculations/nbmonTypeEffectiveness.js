@@ -1,5 +1,4 @@
-// This utils file is used to calculate the type effectiveness of NBMons.
-
+/////////////////////// This utils file is used to calculate the type effectiveness of NBMons ///////////////////////
 require('dotenv').config();
 
 const axios = require('axios').default;

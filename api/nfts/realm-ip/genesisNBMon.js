@@ -8,6 +8,7 @@ const Moralis = require('moralis-v1/node');
 
 // IMPORTS
 const parseJSON = require('../../../utils/jsonParser').parseJSON;
+const { getAttackEffectiveness, getDefenseEffectiveness } = require('../../../api-calculations/nbmonTypeEffectiveness');
 
 // NOTE: The GenesisNBMon contract will only exist in ONE blockchain. This means that there is no need to specify multiple RPC URLs for dynamic interaction.
 // Currently, this RPC URL is set to Cronos Testnet for testing purposes, but it will most likely be on Ethereum.
@@ -60,7 +61,12 @@ const getGenesisNBMon = async (id) => {
         const nbmon = parseJSON(query);
 
         //////////////// TO DO: QUERY THE GENESIS NBMONS GAMEDATA STUFF HERE //////////////////
+		// const GameData = Moralis.Object.extend("Genesis_NBMons_GameData");
+		// const gameData = new Moralis.Query(GameData);
+		// gameData.matchesQuery("NBMon_Instance", query);
 
+		// const gdQuery = await gameData.first({ useMasterKey: true });
+		// const parsedGdQuery = parseJSON(gdQuery);
         ///////////////////////////////////////////////////////////////////////////////////////
 
         // we initialize an empty object to store all the Genesis NBMon data.
@@ -92,6 +98,38 @@ const getGenesisNBMon = async (id) => {
         
         nbmonData['types'] = [firstType, secondType];
 
+        // calculates type effectiveness of the NBMon
+        const attackEff = await getAttackEffectiveness(firstType, secondType);
+        const defenseEff = await getDefenseEffectiveness(firstType, secondType);
+
+        nbmonData['strongAgainst'] = attackEff['Strong against'];
+        nbmonData['weakAgainst'] = attackEff['Weak against'];
+        nbmonData['resistantTo'] = defenseEff['Resistant to'];
+        nbmonData['vulnerableTo'] = defenseEff['Vulnerable to'];
+
+        // obtaining the passives of the NBMon. checks for undefined values as well.
+        const firstPassive = nbmon['stringMetadata'][7] === undefined ? null : nbmon['stringMetadata'][7];
+        const secondPassive = nbmon['stringMetadata'][8] === undefined ? null : nbmon['stringMetadata'][8];
+
+        nbmonData['passives'] = [firstPassive, secondPassive];
+        nbmonData['gender'] = nbmon['stringMetadata'][0] === undefined ? null : nbmon['stringMetadata'][0];
+        nbmonData['rarity'] = nbmon['stringMetadata'][1] === undefined ? null : nbmon['stringMetadata'][1];
+
+        // mutation calculation
+        // checks if nbmon is still an egg
+        if (nbmon['boolMetadata'][0] === true) {
+            nbmonData['mutation'] = 'Not mutated';
+            nbmonData['mutationType'] = null;
+            nbmonData['behavior'] = null;
+        // if it already has hatched
+        } else {
+            nbmonData['mutation'] = nbmon['stringMetadata'][2] === 'Not mutated' ? nbmon['stringMetadata'][2] : 'Mutated';
+            nbmonData['mutationType'] === nbmonData['mutation'] === 'Mutated' ? nbmon['stringMetadata'][2] : null;
+            ////////////////////////// TO DO: CREATE GENESIS BEHAVIOR CALCULATION //////////////////////////
+            // nbmonObj['behavior'] = await getGenesisBehavior(nbmonObj['genus']);
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+        }
+
         console.log(nbmonData);
 
 
@@ -101,5 +139,36 @@ const getGenesisNBMon = async (id) => {
     }
 }
 
-getGenesisNBMon(1);
+/**
+ * `getGenesisNBMonOwner` gets the owner of the Genesis NBMon.
+ * @param {*} id the ID of the Genesis NBMon.
+ * @returns {string} the address of the owner.
+ */
+const getGenesisNBMonOwner = async (id) => {
+    try {
+        await Moralis.start({ 
+            serverUrl,
+            appId,
+            masterKey
+        });
+
+        const MintedNFTs = new Moralis.Query('MintedNFTs');
+        // first we ensure that we are querying for the Genesis NBMons.
+        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        MintedNFTs.equalTo('tokenId', id);
+
+        const genesisNBMon = await MintedNFTs.first({ useMasterKey: true });
+
+        if (genesisNBMon === undefined) {
+            throw new Error('Genesis NBMon with given ID not found in database.');
+        }
+
+        const owner = (parseJSON(genesisNBMon))['owner'];
+        return owner;
+    } catch (err) {
+        throw err;
+    }
+}
+
+// getGenesisNBMon(1);
 
