@@ -1,4 +1,5 @@
 - create getGenesisBehavior function and import in `getGenesisNBMon`.
+- make the alt versions of the genesisNBMon functions for Playfab obtaining.
 - Create addToActivities, import to genesisNBMonMinting API
 - Create uploadGenesisEggMetadata, import to genesisNBMonMinting API
 - declare uploadGenesisEggMetadata and addToActivities in `publicMint`
@@ -12,3 +13,5 @@ and in `getGenesisNBMonOwner` etc where querying in Moralis is needed.
 
 IMPORTANT CHANGES FROM V1 BACKEND:
 1. publicMint (genesisNBMonMinting) now accepts `toAddress` instead of `address` for clarity.
+2. getGenesisNBMonOwner now accepts `id` instead of `nbmonId`.
+3. getOwnerGenesisNBMons is now `getOwnedGenesisNBMons`.

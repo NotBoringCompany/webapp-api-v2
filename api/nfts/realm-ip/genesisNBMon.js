@@ -141,7 +141,7 @@ const getGenesisNBMon = async (id) => {
 
 /**
  * `getGenesisNBMonOwner` gets the owner of the Genesis NBMon.
- * @param {*} id the ID of the Genesis NBMon.
+ * @param {Number} id the ID of the Genesis NBMon.
  * @returns {string} the address of the owner.
  */
 const getGenesisNBMonOwner = async (id) => {
@@ -170,5 +170,42 @@ const getGenesisNBMonOwner = async (id) => {
     }
 }
 
+/**
+ * `getOwnedGenesisNBMons` returns all the Genesis NBMons owned by `address`.
+ * @param {String} address the address of the owner to query.
+ * @returns {Array} an array of Genesis NBMons owned by `address`.
+ */
+const getOwnedGenesisNBMons = async (address) => {
+    try {
+        
+    } catch (err) {
+        throw err;
+    }
+}
+
+/**
+ * `getOwnedGenesisNBMonIDs` returns all the Genesis NBMon IDs owned by `address`.
+ * @param {String} address the address of the owner to query.
+ * @returns {Array} an array of Genesis NBMon IDs owned by `address`.
+ */
+const getOwnedGenesisNBMonIDs = async (address) => {
+    try {
+        const ownedIDs = await genesisContract.getOwnerNFTIds(address);
+        // since the array from the blockchain will be in `BigNumber` type, we need to parse it to `Number` first.
+        let ids = [];
+
+        ownedIDs.forEach((id) => {
+            let convertedID = parseInt(Number(id));
+            ids.push(convertedID);
+        });
+
+        console.log(ids);
+        return ids;
+    } catch (err) {
+        throw err;
+    }
+}
+
 // getGenesisNBMon(1);
+getOwnedGenesisNBMonIDs('0x213D2806B07fB2BFCd51fCbC7503755784C72F09');
 
