@@ -7,11 +7,11 @@ const nbpedia = process.env.NBPEDIA_ID;
 const notionSecret = process.env.NOTION_TOKEN;
 
 /**
- * `getNBMonTypes` retrieves the types of the NBMon.
+ * `getNBMonData` retrieves the data of the NBMon from our handbuilt Notion database (NBPedia). May include blockchain data.
  * @param {String} genus is the genus of the NBMon (e.g. Lamox, Licorine etc.)
- * @returns {Array} an array of the NBMon's types.
+ * @returns {Object} an object containing the NBMon's data.
  */
-const getNBMonTypes = async (genus) => {
+const getNBMonData = async (genus) => {
     try {
         if (genus === undefined || genus === null || genus === '') {
             throw new Error('Please specify a genus');
@@ -41,6 +41,12 @@ const getNBMonTypes = async (genus) => {
 
         const results = response.data.results;
         let types = [];
+        let summary;
+        let species;
+        let behavior;
+        let habitat = [];
+        let intendedPlaystyle;
+        let baseStats;
 
         results.forEach((result) => {
             // case-insensitive search
@@ -58,13 +64,66 @@ const getNBMonTypes = async (genus) => {
                 } else if (amountOfTypes >= 3) {
                     throw new Error('An NBMon cannot have more than 2 types. Please check the Notion database and fix this.');
                 }
+
+                // we now obtain the summary of the NBMon.
+                if (result.properties.Summary.rich_text.length === 0) {
+                    summary = 'No summary specified yet.';
+                } else {
+                    summary = result.properties.Summary.rich_text[0].plain_text;
+                }
+
+                // we now obtain the species of the NBMon.
+                if (result.properties.Species.select === null) {
+                    species = 'No species specified yet.';
+                } else {
+                    species = result.properties.Species.select.name;
+                }
+
+                // we now obtain the behavior of the NBMon.
+                if (result.properties.Behavior.select === null) {
+                    behavior = 'No behavior specified yet.'
+                } else {
+                    behavior = result.properties.Behavior.select.name;
+                }
+
+                // we now obtain the habitat of the NBMon.
+                if (result.properties.Habitat.multi_select.length === 0) {
+                    habitat = [];
+                } else {
+                    result.properties.Habitat.multi_select.forEach((habitatType) => {
+                        habitat.push(habitatType.name);
+                    });
+                }
+
+                // we now obtain the intended playstyle of the NBMon.
+                if (result.properties['Intended Playstyle'].rich_text.length === 0) {
+                    intendedPlaystyle = 'No intended playstyle specified yet.';
+                } else {
+                    intendedPlaystyle = result.properties['Intended Playstyle'].rich_text[0].plain_text;
+                }
+
+                // we now obtain the base stats of the NBMon.
+                if (result.properties['Base Stats (Range: 3 ~ 8, Max 35?)'].rich_text.length === 0) {
+                    baseStats = 'No base stats specified yet.';
+                } else {
+                    baseStats = result.properties['Base Stats (Range: 3 ~ 8, Max 35?)'].rich_text[0].plain_text;
+                }
             }
         });
 
-        return types;
+        return {
+            'Genus': genus,
+            'Types': types,
+            'Summary': summary,
+            'Species': species,
+            'Behavior': behavior,
+            'Habitat': habitat,
+            'Intended Playstyle': intendedPlaystyle,
+            'Base Stats': baseStats
+        }
     } catch (err) {
         throw err;
     }
 }
 
-module.exports = { getNBMonTypes };
+module.exports = { getNBMonData };
