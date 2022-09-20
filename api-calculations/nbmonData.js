@@ -14,7 +14,16 @@ const notionSecret = process.env.NOTION_TOKEN;
 const getNBMonData = async (genus) => {
     try {
         if (genus === undefined || genus === null || genus === '') {
-            throw new Error('Please specify a genus');
+            return {
+                'Genus': null,
+                'Types': null,
+                'Summary': null,
+                'Species': null,
+                'Behavior': null,
+                'Habitat': null,
+                'Intended Playstyle': null,
+                'Base Stats': null  
+            };
         }
 
         // the config to obtain the NBPedia from notion.

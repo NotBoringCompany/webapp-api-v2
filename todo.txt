@@ -1,5 +1,5 @@
 - import GameData class to `getGenesisNBMon` as well to return the game data related stuff.
-- create `getListingData` function for `getGenesisNBMon`.
+- create `getListingData` and other marketplace functions for `getGenesisNBMon`.
 - make the alt versions of the genesisNBMon functions for Playfab obtaining.
 - Create addToActivities, import to genesisNBMonMinting API
 - Create uploadGenesisEggMetadata, import to genesisNBMonMinting API

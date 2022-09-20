@@ -49,9 +49,9 @@ const getGenesisNBMon = async (id) => {
         const GenesisNBMon = new Moralis.Query("MintedNFTs");
         // we set the query to match the contract address of the Genesis NBMon contract and the specified ID.
         GenesisNBMon.equalTo("contractAddress", process.env.GENESIS_NBMON_TESTING_ADDRESS);
-        GenesisNBMon.equalTo("tokenId", id);
+        const querySearch = GenesisNBMon.equalTo("tokenId", id);
 
-        const query = await GenesisNBMon.first({ useMasterKey: true });
+        const query = await querySearch.first({ useMasterKey: true });
 
         // if the query result doesn't return anything, we throw an error.
         if (query === undefined || query === null || query === "" || query.length === 0) {
@@ -63,6 +63,10 @@ const getGenesisNBMon = async (id) => {
         const nbmon = parseJSON(query);
 
         //////////////// TO DO: QUERY THE GENESIS NBMONS GAMEDATA STUFF HERE //////////////////
+        // const GameData = Moralis.Object.extend('nbmonGameData');
+        // const gameData = new GameData();
+        // gameData.matchesQuery('nbmonInstance', querySearch);
+
 		// const GameData = Moralis.Object.extend("Genesis_NBMons_GameData");
 		// const gameData = new Moralis.Query(GameData);
 		// gameData.matchesQuery("NBMon_Instance", query);
@@ -121,7 +125,7 @@ const getGenesisNBMon = async (id) => {
 
         let nbpediaData;
 
-        if (nbmonData['genus'] === null) {
+        if (nbmonData['genus'] === null || "") {
             nbmonData['genusDescription'] = null;
         } else {
             nbpediaData = getNBMonData(nbmonData['genus']);
@@ -227,6 +231,8 @@ const getGenesisNBMon = async (id) => {
     }
 }
 
+getGenesisNBMon(1);
+
 /**
  * `getGenesisNBMonOwner` gets the owner of the Genesis NBMon.
  * @param {Number} id the ID of the Genesis NBMon.
@@ -302,7 +308,3 @@ const getOwnedGenesisNBMonIDs = async (address) => {
         throw err;
     }
 }
-
-// getGenesisNBMon(1);
-getOwnedGenesisNBMonIDs('0x213D2806B07fB2BFCd51fCbC7503755784C72F09');
-

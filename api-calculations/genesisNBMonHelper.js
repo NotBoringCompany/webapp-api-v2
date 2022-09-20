@@ -18,6 +18,12 @@ const getGenesisFertilityDeduction = (rarity) => {
             return 375;
         case 'Mythical':
             return 300;
+        case undefined:
+            return null;
+        case null:
+            return null;
+        case '':
+            return null;
         default:
             throw new Error('Invalid rarity.');
     }
