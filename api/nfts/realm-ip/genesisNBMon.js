@@ -62,18 +62,13 @@ const getGenesisNBMon = async (id) => {
         // we parse the query to return a readable object.
         const nbmon = parseJSON(query);
 
-        //////////////// TO DO: QUERY THE GENESIS NBMONS GAMEDATA STUFF HERE //////////////////
-        // const GameData = Moralis.Object.extend('nbmonGameData');
-        // const gameData = new GameData();
-        // gameData.matchesQuery('nbmonInstance', querySearch);
+        // we query the nbmon instance in another class called `nbmonGameData` to retrieve the nbmon's game data
+        const GameData = new Moralis.Query('nbmonGameData');
+        GameData.matchesQuery('nbmonInstance', querySearch);
 
-		// const GameData = Moralis.Object.extend("Genesis_NBMons_GameData");
-		// const gameData = new Moralis.Query(GameData);
-		// gameData.matchesQuery("NBMon_Instance", query);
-
-		// const gdQuery = await gameData.first({ useMasterKey: true });
-		// const parsedGdQuery = parseJSON(gdQuery);
-        ///////////////////////////////////////////////////////////////////////////////////////
+        const gameDataQuery = await GameData.first({ useMasterKey: true });
+        // we parse the nbmon game data query to return a readable object.
+        const nbmonGameData = parseJSON(gameDataQuery);
 
         // we initialize an empty object to store all the Genesis NBMon data.
         let nbmonData = {};
@@ -178,50 +173,18 @@ const getGenesisNBMon = async (id) => {
             nbmonData['listingData'] = null;
         }
 
-        ////////////////////////// GET GAME DATA FROM GAMEDATA MORALIS HERE/////////////////////////////////////
-        // nbmonObj["currentExp"] =
-		// 	parsedGdQuery["currentExp"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["currentExp"];
-		// nbmonObj["level"] =
-		// 	parsedGdQuery["level"] === undefined ? null : parsedGdQuery["level"];
-		// nbmonObj["nickname"] =
-		// 	parsedGdQuery["nickname"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["nickname"];
-		// nbmonObj["skillList"] =
-		// 	parsedGdQuery["skillList"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["skillList"];
-		// nbmonObj["maxHpEffort"] =
-		// 	parsedGdQuery["maxHpEffort"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["maxHpEffort"];
-		// nbmonObj["maxEnergyEffort"] =
-		// 	parsedGdQuery["maxEnergyEffort"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["maxEnergyEffort"];
-		// nbmonObj["speedEffort"] =
-		// 	parsedGdQuery["speedEffort"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["speedEffort"];
-		// nbmonObj["attackEffort"] =
-		// 	parsedGdQuery["attackEffort"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["attackEffort"];
-		// nbmonObj["specialAttackEffort"] =
-		// 	parsedGdQuery["specialAttackEffort"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["specialAttackEffort"];
-		// nbmonObj["defenseEffort"] =
-		// 	parsedGdQuery["defenseEffort"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["defenseEffort"];
-		// nbmonObj["specialDefenseEffort"] =
-		// 	parsedGdQuery["specialDefenseEffort"] === undefined
-		// 		? null
-		// 		: parsedGdQuery["specialDefenseEffort"];
-        ///////////////////////////////////////////////////////////////////////////
+        // nbmon game data manipulation
+        nbmonData['currentExp'] = nbmonGameData['currentExp'] === undefined ? null : nbmonGameData['currentExp'];
+        nbmonData['level'] = nbmonGameData['level'] === undefined ? null : nbmonGameData['level'];
+        nbmonData['nickname'] = nbmonGameData['nickname'] === undefined ? null : nbmonGameData['nickname'];
+        nbmonData['skillList'] = nbmonGameData['skillList'] === undefined ? null : nbmonGameData['skillList'];
+        nbmonData['maxHpEffort'] = nbmonGameData['maxHpEffort'] === undefined ? null : nbmonGameData['maxHpEffort'];
+        nbmonData['maxEnergyEffort'] = nbmonGameData['maxEnergyEffort'] === undefined ? null : nbmonGameData['maxEnergyEffort'];
+        nbmonData['speedEffort'] = nbmonGameData['speedEffort'] === undefined ? null : nbmonGameData['speedEffort'];
+        nbmonData['attackEffort'] = nbmonGameData['attackEffort'] === undefined ? null : nbmonGameData['attackEffort'];
+        nbmonData['spAtkEffort'] = nbmonGameData['spAtkEffort'] === undefined ? null : nbmonGameData['spAtkEffort'];
+        nbmonData['defenseEffort'] = nbmonGameData['defenseEffort'] === undefined ? null : nbmonGameData['defenseEffort'];
+        nbmonData['spDefEffort'] = nbmonGameData['spDefEffort'] === undefined ? null : nbmonGameData['spDefEffort'];
 
         console.log(nbmonData);
 
@@ -230,8 +193,6 @@ const getGenesisNBMon = async (id) => {
         throw err;
     }
 }
-
-getGenesisNBMon(1);
 
 /**
  * `getGenesisNBMonOwner` gets the owner of the Genesis NBMon.
@@ -307,4 +268,11 @@ const getOwnedGenesisNBMonIDs = async (address) => {
     } catch (err) {
         throw err;
     }
+}
+
+module.exports = {
+    getGenesisNBMon,
+    getGenesisNBMonOwner,
+    getOwnedGenesisNBMons,
+    getOwnedGenesisNBMonIDs
 }

@@ -20,3 +20,4 @@ IMPORTANT CHANGES FROM V1 BACKEND:
 4. getOwnerGenesisNBMonIDs is now `getOwnedGenesisNBMonIDs`.
 5. getGenesisNBMonTypes is now converted into `getNBMonData` to retrieve not just the types of an NBMon but ALL data (and not just Genesis NBMons). It also accepts `genus` instead of `genusParam`.
 6. getGenesisBehavior is now also obtained from `getNBMonData`.
+7. specialAttackEffort and specialDefenseEffort from is now spAtkEffort and spDefEffort. Both are also obtained from `nbmonGameData` class, not `Genesis_NBMons_GameData`
