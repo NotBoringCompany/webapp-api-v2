@@ -81,15 +81,21 @@ const publicMint = async (toAddress) => {
         const blockchain = await rpcProvider.getNetwork();
         mintedNFTs.set("blockchain", blockchain);
 
-        ////////////// TO DO: CREATE GENESISNBMONSGAMEDATA CLASS AND SAVE TO IT HERE //////////////////////////////
-        //////////// TO DO: UPDATE THIS FUNCTION TO HAVE A THEN() THAT CALLS THE GAME DATA SAVING FUNCTION ///////////////////
+        // after successful minting and setting the variables, we can now save the newly minted NBMon to both our `MintedNFTs` and `nbmonGameData` class.
         await mintedNFTs.save(null, { useMasterKey: true }).then((obj) => {
-            console.log(obj);
+            gameData.set('nbmonInstance', {
+                __type: 'Pointer',
+                className: 'MintedNFTs',
+                objectId: obj.id
+            });
         });
 
-        ///////////////////// TO DO: ADDTOACTIVITIES + UPLOADGENESISEGGMETADATA HERE ////////////////////////////////////
+        await gameData.save(null, { useMasterKey: true });
 
-        // return { nbmonId: mintedId };
+        ///////////////////// TO DO: ADDTOACTIVITIES + UPLOADGENESISEGGMETADATA HERE ////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        return { nbmonId: mintedId };
     } catch (err) {
         throw err;
     }
@@ -132,9 +138,17 @@ const publicMint = async (toAddress) => {
         const currentCount = await genesisContract._currentIndex();
         const mintedId = parseInt(currentCount) - 1;
 
+        // just in case that minted ID isn't an actual ID.
+        if (!mintedId || mintedId === undefined || isNaN(mintedId)) {
+            throw new Error('mintedId is undefined or NaN.');
+        }
+
         /// Moralis saving-related variables
         const MintedNFTs = Moralis.Object.extend("MintedNFTs");
         const mintedNFTs = new MintedNFTs();
+
+        const GameData = Moralis.Object.extend("nbmonGameData");
+        const gameData = new GameData();
 
         mintedNFTs.set("nftName", "Genesis NBMon");
         mintedNFTs.set("contractAddress", genesisContract.address);
@@ -150,15 +164,21 @@ const publicMint = async (toAddress) => {
         const blockchain = await rpcProvider.getNetwork();
         mintedNFTs.set("blockchain", blockchain);
 
-        ////////////// TO DO: CREATE GENESISNBMONSGAMEDATA CLASS AND SAVE TO IT HERE //////////////////////////////
-        //////////// TO DO: UPDATE THIS FUNCTION TO HAVE A THEN() THAT CALLS THE GAME DATA SAVING FUNCTION ///////////////////
+        // after successful minting and setting the variables, we can now save the newly minted NBMon to both our `MintedNFTs` and `nbmonGameData` class.
         await mintedNFTs.save(null, { useMasterKey: true }).then((obj) => {
-            console.log(obj);
+            gameData.set('nbmonInstance', {
+                __type: 'Pointer',
+                className: 'MintedNFTs',
+                objectId: obj.id
+            });
         });
 
-        ///////////////////// TO DO: ADDTOACTIVITIES + UPLOADGENESISEGGMETADATA HERE ////////////////////////////////////
+        await gameData.save(null, { useMasterKey: true });
 
-        // return { nbmonId: mintedId };
+        ///////////////////// TO DO: ADDTOACTIVITIES + UPLOADGENESISEGGMETADATA HERE ////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        return { nbmonId: mintedId };
     } catch (err) {
         throw err;
     }

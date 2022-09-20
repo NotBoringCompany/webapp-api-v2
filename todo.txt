@@ -1,4 +1,3 @@
-- create genesisNBmonsGameData class in moralis and save the nbmon in this class after saving it to GenesisNBMons in the `publicMint` function
 - import GameData class to `getGenesisNBMon` as well to return the game data related stuff.
 - create `getListingData` function for `getGenesisNBMon`.
 - make the alt versions of the genesisNBMon functions for Playfab obtaining.
@@ -7,9 +6,11 @@
 - declare uploadGenesisEggMetadata and addToActivities in `publicMint`
 - Create an emergency check for GenesisNBMons class in Moralis (just in case some minted NBMons are not added so that it can manually be added to the Moralis DB).
 - Change hatching duration in `publicMint` for proper production.
+- remove console.logs (later on)
+
 - IMPORTANT: change genesis testing contract to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
 and in `getGenesisNBMonOwner` etc where querying in Moralis is needed.
-- remove console.logs (later on)
+- IMPORTANT: Gaming Backend Repo needs to be changed with the changes in the new moralis db.
 
 
 IMPORTANT CHANGES FROM V1 BACKEND:
