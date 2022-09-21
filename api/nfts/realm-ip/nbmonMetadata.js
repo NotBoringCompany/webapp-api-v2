@@ -3,9 +3,9 @@ require('dotenv').config();
 const AWS = require('aws-sdk');
 const Moralis = require('moralis-v1/node');
 const moment = require('moment');
-const { getGenesisNBMon } = require('./genesisNBMon');
 
 // IMPORTS
+const { getGenesisNBMon } = require('./genesisNBMon');
 
 const hatchingDuration = process.env.HATCHING_DURATION;
 

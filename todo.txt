@@ -23,3 +23,5 @@ IMPORTANT CHANGES FROM V1 BACKEND:
 5. getGenesisNBMonTypes is now converted into `getNBMonData` to retrieve not just the types of an NBMon but ALL data (and not just Genesis NBMons). It also accepts `genus` instead of `genusParam`.
 6. getGenesisBehavior is now also obtained from `getNBMonData`.
 7. specialAttackEffort and specialDefenseEffort from is now spAtkEffort and spDefEffort. Both are also obtained from `nbmonGameData` class, not `Genesis_NBMons_GameData`
+8. `uploadGenesisHatchedMetadata` now no longer checks from `Hatched_Metadata` class as the new server instance doesn't have the `Hatched_Metadata` class and may seem like a redundant step. It also
+instantly just reuploads to the same URI instead of deleting the Object in the Bucket first before reuploading.

@@ -5,6 +5,7 @@ const ethers = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
+const { uploadGenesisEggMetadata } = require('./nbmonMetadata');
 // TO DO: create addToActivities + uploadGenesisEggMetadata and import here
 
 const privateKey = process.env.TEST_ADMIN_PRIVATE_KEY;
@@ -93,8 +94,11 @@ const publicMint = async (toAddress) => {
 
         await gameData.save(null, { useMasterKey: true });
 
-        ///////////////////// TO DO: ADDTOACTIVITIES + UPLOADGENESISEGGMETADATA HERE ////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // we upload the newly minted NBMon egg's metadata to DigitalOcean Spaces.
+        uploadGenesisEggMetadata(mintedId);
+
+        ///////////////////// TO DO: ADDTOACTIVITIES////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
 
         return { nbmonId: mintedId };
     } catch (err) {
@@ -176,8 +180,11 @@ const publicMint = async (toAddress) => {
 
         await gameData.save(null, { useMasterKey: true });
 
-        ///////////////////// TO DO: ADDTOACTIVITIES + UPLOADGENESISEGGMETADATA HERE ////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // we upload the newly minted NBMon egg's metadata to DigitalOcean Spaces.
+        uploadGenesisEggMetadata(mintedId);
+
+        ///////////////////// TO DO: ADDTOACTIVITIES////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
 
         return { nbmonId: mintedId };
     } catch (err) {
