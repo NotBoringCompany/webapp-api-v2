@@ -8,6 +8,7 @@ const moment = require('moment');
 // TO DO: create addToActivities + uploadGenesisEggMetadata and import here
 
 const privateKey = process.env.TEST_ADMIN_PRIVATE_KEY;
+const hatchingDuration = process.env.HATCHING_DURATION;
 
 const rpcUrl = process.env.CRONOS_RPC_URL;
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
@@ -39,8 +40,8 @@ const publicMint = async (toAddress) => {
         /// NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
         const amountToMint = 1;
         const stringMetadata = ["", "", "", "", "", "", "", "", ""];
-		// current hatching duration for testing is 50 seconds. This will be changed to the appropriate number for production.
-		const numericMetadata = [50, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		// current hatching duration for testing is temporary. This will be changed to the appropriate number for production.
+		const numericMetadata = [hatchingDuration, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		const boolMetadata = [true];
 
         const unsignedTx = await genesisContract.populateTransaction.publicMint(
@@ -114,8 +115,8 @@ const publicMint = async (toAddress) => {
         /// NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
         const amountToMint = 1;
         const stringMetadata = ["", "", "", "", "", "", "", "", ""];
-		// current hatching duration for testing is 50 seconds. This will be changed to the appropriate number for production.
-		const numericMetadata = [50, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		// current hatching duration for testing is temporary. This will be changed to the appropriate number for production.
+		const numericMetadata = [hatchingDuration, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		const boolMetadata = [true];
 
         const unsignedTx = await genesisContract.populateTransaction.whitelistedMint(
