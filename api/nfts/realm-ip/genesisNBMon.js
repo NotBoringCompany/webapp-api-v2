@@ -29,10 +29,6 @@ const genesisContract = new ethers.Contract(
     rpcProvider
 );
 
-const serverUrl = process.env.MORALIS_SERVERURL;
-const appId = process.env.MORALIS_APPID;
-const masterKey = process.env.MORALIS_MASTERKEY;
-
 // FUNCTIONS
 /**
  * `getGenesisNBMon` returns a Genesis NBMon object with all relevant blockchain and non-blockchain data.
@@ -41,11 +37,6 @@ const masterKey = process.env.MORALIS_MASTERKEY;
  */
 const getGenesisNBMon = async (id) => {
     try {
-        await Moralis.start({ 
-            serverUrl,
-            appId,
-            masterKey
-        });
         const GenesisNBMon = new Moralis.Query("MintedNFTs");
         // we set the query to match the contract address of the Genesis NBMon contract and the specified ID.
         GenesisNBMon.equalTo("contractAddress", process.env.GENESIS_NBMON_TESTING_ADDRESS);
