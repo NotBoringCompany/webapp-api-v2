@@ -1,16 +1,10 @@
 require('dotenv').config();
 
-const Moralis = require('moralis-v1/node');
 const axios = require('axios').default;
 
 const nbpedia = process.env.NBPEDIA_ID;
 const passivesTable = process.env.PASSIVESTABLE_ID;
 const notionSecret = process.env.NOTION_TOKEN;
-
-const serverUrl = process.env.MORALIS_SERVERURL;
-const appId = process.env.MORALIS_APPID;
-const masterKey = process.env.MORALIS_MASTERKEY;
-
 
 /**
  * `randomizeGender` randomizes the gender of the NBMon between male and female.
@@ -86,6 +80,8 @@ const randomizeGenesisMutation = async (genus) => {
     try {
         const mutationRand = Math.floor(Math.random() * 1000) + 1;
 
+        let mutationType;
+
         //there is a 0.5% chance of mutation for Genesis NBMons.
         if (mutationRand >= 996) {
             // these genera are sorted based on how they are queried from the axios response from Notion.
@@ -127,8 +123,6 @@ const randomizeGenesisMutation = async (genus) => {
             //the results obtained from the axios response if no errors are found
             const results = response.data.results;
 
-            let mutationType;
-
             // here we query through the results index until we find the one that matches our genus.
             results.forEach((result) => {
                 // if it matches, we proceed to get the mutation type.
@@ -152,9 +146,11 @@ const randomizeGenesisMutation = async (genus) => {
                     mutationType = possibleMutations[mutationTypeRand].name;
                 }
             });
+        } else (
+            mutationType = 'Not mutated'
+        );
 
-            return mutationType;
-        }
+        return mutationType;
     } catch (err) {
         throw err;
     }
@@ -280,4 +276,13 @@ const randomizePassives = async () => {
     } catch (err) {
         throw err;
     }
+}
+
+module.exports = {
+    randomizeGenesisGenus,
+    randomizeGenesisRarity,
+    randomizeGenesisMutation,
+    randomizeGenesisPotential,
+    randomizePassives,
+    randomizeGender
 }
