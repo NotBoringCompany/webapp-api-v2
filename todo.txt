@@ -28,3 +28,5 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 9. `genesisStatRandomizer.js` is now called `nbmonBlockchainStats.js` and this file will contain not just genesis NBMons.
 10. `randomizeGenesisGender` is now `randomizeGender`.
 11. `randomizeGenesisMutation` now accepts `genus` as a parameter instead of `genusParam`.
+12. `randomizeGenesisPassives` is now `randomizePassives` UNTIL FURTHER NOTICE (ESPECIALLY IF WE WANT GENESIS NBMONS TO HAVE BETTER PASSIVES!!).
+13. `randomizeGenesisPassives` also now returns an object showing two passives instead of an array.

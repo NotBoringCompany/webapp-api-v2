@@ -281,5 +281,3 @@ const randomizePassives = async () => {
         throw err;
     }
 }
-
-randomizePassives();
