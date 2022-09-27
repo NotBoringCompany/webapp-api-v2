@@ -18,6 +18,7 @@ const statRandomizer = require('../../../api-calculations/nbmonBlockchainStats.j
 const { getNBMonData } = require('../../../api-calculations/nbmonData.js');
 const { getBornAtAlt } = require('../../../api-calculations/genesisNBMonHelper.js');
 const { saveHatchingSignature } = require('./activities.js');
+const { resourceLimits } = require('worker_threads');
 
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
@@ -172,8 +173,60 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
     }
 }
 
+/**
+ * `updateHatchedNBMon` updates the NBMon's blockchain data in Moralis. Since previously after the NBMon was minted it gets added to Moralis, we now also 
+ * need to update the data in Moralis after the NBMon hatches in the blockchain to reflect its new data.
+ * @param {Number} nbmonId the ID of the Genesis NBMon
+ * @returns {Object} an Object that shows 'OK' if the update is successful.
+ */
+const updateHatchedNBMon = async (nbmonId) => {
+    try {
+        // we get the nbmon from the blockchain.
+        // Note: IMPORTANT. the nbmon needs to already be hatched and have its stats updated in the blockchain prior to this, or else the updated stats will either
+        // remain the same, or worse, be completely off.
+        const nbmon = await genesisContract.getNFT(nbmonId);
+        const stringMetadata = nbmon[7];
+        const numericMetadata = nbmon[8];
+
+        // the numeric metadata obtained above will be in BigNumber format, which means that it needs to be converted to a Number before updating it to Moralis.
+        let convertedNumericMetadata = [];
+
+        numericMetadata.forEach((metadata) => {
+            const converted = parseInt(Number(metadata));
+            convertedNumericMetadata.push(converted);
+        });
+
+        const boolMetadata = nbmon[9];
+
+        const MintedNFTs = new Moralis.Query('MintedNFTs');
+        // we ensure that we are querying for Genesis NBMons in the MintedNFTs class.
+        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        MintedNFTs.equalTo('tokenId', nbmonId);
+
+        const genesisNBMon = await MintedNFTs.first({ useMasterKey: true });
+
+        if (genesisNBMon === undefined) {
+            throw new Error('Genesis NBMon with given ID not found in database.');
+        }
+
+        genesisNBMon.set('stringMetadata', stringMetadata);
+        genesisNBMon.set('numericMetadata', convertedNumericMetadata);
+        genesisNBMon.set('boolMetadata', boolMetadata);
+
+        await genesisNBMon.save(null, { useMasterKey: true });
+
+        return {
+            status: 'OK'
+        }
+    } catch (err) {
+        throw err;
+    }
+}
+
 module.exports = {
-    generateSignature
+    generateSignature,
+    randomizeHatchingStats,
+    updateHatchedNBMon
 }
 
 

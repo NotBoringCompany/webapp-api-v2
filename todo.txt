@@ -34,3 +34,4 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 14. `saveHatchingSignature` now returns an Object that shows an "OK" code if successful.
 15. `saveHatchingSignature` now has a try and error block catch, instead of no error handling in the v1 backend.
 16. `addToActivities` now accepts `txHash` and `txType` to shorten the parameters instead of `transactionHash` and `transactionType`.
+17. `updateHatchedNBMon` now accepts `nbmonId` instead of `id` as a parameter.
