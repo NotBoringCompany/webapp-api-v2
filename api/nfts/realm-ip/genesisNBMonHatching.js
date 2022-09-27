@@ -16,6 +16,8 @@ const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 // IMPORTS
 const statRandomizer = require('../../../api-calculations/nbmonBlockchainStats.js');
 const { getNBMonData } = require('../../../api-calculations/nbmonData.js');
+const { getBornAtAlt } = require('../../../api-calculations/genesisNBMonHelper.js');
+const { saveHatchingSignature } = require('./activities.js');
 
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
@@ -66,6 +68,8 @@ const generateSignature = async (nbmonId, minter, bornAt) => {
  */
 const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
     try {
+        /// Note: Notice how for most of the parameter-dependent code, we don't check for errors. This is because the error handling with error throws is already
+        /// done inside these methods, so no need for extra checks here.
         // we get the wallet object of the minter
         const minter = new ethers.Wallet(privateKey, rpcProvider);
 
@@ -73,11 +77,6 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
         const gender = statRandomizer.randomizeGender();
         const rarity = statRandomizer.randomizeGenesisRarity();
         const genus = statRandomizer.randomizeGenesisGenus();
-
-        if (genus === undefined || genus === null || genus === '') {
-            throw new Error('Error getting genus. Please check the code.');
-        }
-
         const mutation = await statRandomizer.randomizeGenesisMutation(genus);
         const species = 'Origin';
         const fertility = 3000;
@@ -85,15 +84,93 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
         // getting nbmon data based on genus
         const nbmonData = await getNBMonData(genus);
 
-        const types = nbmonData['Types'];
+        const types = nbmonData['Types'].length > 0 ? nbmonData['Types'] : null;
+        const [typeOne, typeTwo] = [types[0], types[1]];
+        const potential = statRandomizer.randomizeGenesisPotential(rarity);
 
-        console.log(gender, rarity, genus, mutation, types);
+        if (potential.length === 0) {
+            throw new Error('Error getting potential. Please check the code.');
+        }
+
+        const [
+            healthPotential,
+			energyPotential,
+			atkPotential,
+			defPotential,
+			spAtkPotential,
+			spDefPotential,
+			speedPotential,
+        ] = [
+            potential[0],
+			potential[1],
+			potential[2],
+			potential[3],
+			potential[4],
+			potential[5],
+			potential[6],
+        ];
+
+        const passives = await statRandomizer.randomizePassives();
+        const [passiveOne, passiveTwo] = [passives[0], passives[1]];
+        const blockNumber = await rpcProvider.getBlockNumber();
+        const hatchedTimestamp = (await rpcProvider.getBlock(blockNumber)).timestamp;
+
+        // pack all of the calculated data into the different metadata arrays
+        const stringMetadata = [
+            gender,
+            rarity,
+            mutation,
+            species,
+            genus,
+            typeOne,
+            typeTwo,
+            passiveOne,
+            passiveTwo
+        ];
+
+        const numericMetadata = [
+            0,
+            healthPotential,
+			energyPotential,
+			atkPotential,
+			defPotential,
+			spAtkPotential,
+			spDefPotential,
+			speedPotential,
+			fertility,
+			hatchedTimestamp,
+        ];
+
+        const boolMetadata = [false];
+
+        // we get bornAt to match signature
+        const bornAt = await getBornAtAlt(nbmonId);
+
+        // after all the data is calculated and sorted, we are now ready to sign the transaction and call `addHatchingStats` for the NBMon.
+        const unsignedTx = await genesisContract.populateTransaction.addHatchingStats(
+            nbmonId,
+            minter.address,
+            bornAt,
+            txSalt,
+            signature,
+            stringMetadata,
+            numericMetadata,
+            boolMetadata
+        );
+
+        const signedTx = await minter.signTransaction(unsignedTx);
+        const minedTx = await signedTx.wait();
+
+        await saveHatchingSignature(signature);
+
+        return {
+            response: minedTx,
+            signature: signature
+        }
     } catch (err) {
         throw err;
     }
 }
-
-randomizeHatchingStats(1, 'asdasdas', 'asdasd');
 
 module.exports = {
     generateSignature

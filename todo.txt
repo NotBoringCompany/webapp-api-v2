@@ -1,3 +1,4 @@
+- create checkHatchingSignatureValid and invalidateHatchingSignature
 - create generalConfig and config functions for frontend.
 - create `getListingData` and other marketplace functions for `getGenesisNBMon`.
 - make the alt versions of the genesisNBMon functions for Playfab obtaining.
@@ -30,3 +31,6 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 11. `randomizeGenesisMutation` now accepts `genus` as a parameter instead of `genusParam`.
 12. `randomizeGenesisPassives` is now `randomizePassives` UNTIL FURTHER NOTICE (ESPECIALLY IF WE WANT GENESIS NBMONS TO HAVE BETTER PASSIVES!!).
 13. `randomizeGenesisPassives` also now returns an object showing two passives instead of an array.
+14. `saveHatchingSignature` now returns an Object that shows an "OK" code if successful.
+15. `saveHatchingSignature` now has a try and error block catch, instead of no error handling in the v1 backend.
+16. `addToActivities` now accepts `txHash` and `txType` to shorten the parameters instead of `transactionHash` and `transactionType`.

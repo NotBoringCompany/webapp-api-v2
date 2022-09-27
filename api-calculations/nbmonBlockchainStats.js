@@ -80,8 +80,6 @@ const randomizeGenesisMutation = async (genus) => {
     try {
         const mutationRand = Math.floor(Math.random() * 1000) + 1;
 
-        let mutationType;
-
         //there is a 0.5% chance of mutation for Genesis NBMons.
         if (mutationRand >= 996) {
             // these genera are sorted based on how they are queried from the axios response from Notion.
@@ -123,6 +121,8 @@ const randomizeGenesisMutation = async (genus) => {
             //the results obtained from the axios response if no errors are found
             const results = response.data.results;
 
+            let mutationType;
+
             // here we query through the results index until we find the one that matches our genus.
             results.forEach((result) => {
                 // if it matches, we proceed to get the mutation type.
@@ -146,11 +146,11 @@ const randomizeGenesisMutation = async (genus) => {
                     mutationType = possibleMutations[mutationTypeRand].name;
                 }
             });
-        } else (
-            mutationType = 'Not mutated'
-        );
 
-        return mutationType;
+            return mutationType;
+        } else {
+            return 'Not mutated';
+        }
     } catch (err) {
         throw err;
     }
