@@ -9,11 +9,13 @@
 - Change hatching duration in `publicMint` for proper production.
 - remove console.logs (later on)
 - remove require dotenv and moralis imports from all fiels apart from server.js
+- test if `checkHatchingSignatureValid` works with the decoder after some variables are changed.
 
-- IMPORTANT: change genesis testing contract to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
+- IMPORTANT: change ALL genesis testing contract instances (e.g. process.env.GENESIS_NBMON_TESTING_ADDRESS) to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
 and in `getGenesisNBMonOwner` etc where querying in Moralis is needed.
 - IMPORTANT: Gaming Backend Repo needs to be changed with the changes in the new moralis db.
 - IMPORTANT: security implementation for `uploadGenesisEggMetadata` as now anyone can just call and upload it.
+- IMPORTANT: security implementation for ALL new moralis classes in new DB. they are still publicly open for read and write.
 
 
 IMPORTANT CHANGES FROM V1 BACKEND:
@@ -31,7 +33,13 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 11. `randomizeGenesisMutation` now accepts `genus` as a parameter instead of `genusParam`.
 12. `randomizeGenesisPassives` is now `randomizePassives` UNTIL FURTHER NOTICE (ESPECIALLY IF WE WANT GENESIS NBMONS TO HAVE BETTER PASSIVES!!).
 13. `randomizeGenesisPassives` also now returns an object showing two passives instead of an array.
-14. `saveHatchingSignature` now returns an Object that shows an "OK" code if successful.
-15. `saveHatchingSignature` now has a try and error block catch, instead of no error handling in the v1 backend.
-16. `addToActivities` now accepts `txHash` and `txType` to shorten the parameters instead of `transactionHash` and `transactionType`.
-17. `updateHatchedNBMon` now accepts `nbmonId` instead of `id` as a parameter.
+14. `saveHatchingSignature` now has a `nftName` parameter for clarity on which nft it is, since it doesn't only save Genesis NBMons' signatures. 
+15. `saveHatchingSignature` now returns an Object that shows an "OK" code if successful.
+16. `saveHatchingSignature` now has a try and error block catch, instead of no error handling in the v1 backend.
+17. `addToActivities` now accepts `txHash` and `txType` to shorten the parameters instead of `transactionHash` and `transactionType`.
+18. `updateHatchedNBMon` now accepts `nbmonId` instead of `id` as a parameter.
+19. `userTransactionsActivities` class in Moralis is now `UserActivities`. Some fields inside the class are also renamed.
+20. `value` is renamed to `txValue` in `UserActivities` class and is now a number type, not a string.
+21. instead of only `nbmonId`, `UserActivities` class now accepts `tokenId`, `nftContractAddress` and `nftName` for further clarity and to accept ALL nfts.
+22. `checkHatchingSignatureValid` now accepts `txHash` instead of `hash` as a parameter.
+23. `checkhatchignSignatureValid` now has a new parameter, `network`, to check for the network that the activity was conducted in.

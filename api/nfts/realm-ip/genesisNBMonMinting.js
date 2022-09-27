@@ -40,7 +40,7 @@ const publicMint = async (toAddress) => {
         
         /// NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
         const amountToMint = 1;
-        const stringMetadata = ["", "", "", "", "", "", "", "", ""];
+        const stringMetadata = ['', '', '', '', '', '', '', '', ''];
 		// current hatching duration for testing is temporary. This will be changed to the appropriate number for production.
 		const numericMetadata = [hatchingDuration, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		const boolMetadata = [true];
@@ -66,22 +66,22 @@ const publicMint = async (toAddress) => {
         const mintedId = parseInt(currentCount) - 1;
 
         /// Moralis saving-related variables
-        const MintedNFTs = Moralis.Object.extend("MintedNFTs");
+        const MintedNFTs = Moralis.Object.extend('MintedNFTs');
         const mintedNFTs = new MintedNFTs();
 
-        mintedNFTs.set("nftName", "Genesis NBMon");
-        mintedNFTs.set("contractAddress", genesisContract.address);
-        mintedNFTs.set("tokenId", mintedId);
-        mintedNFTs.set("owner", toAddress);
-        mintedNFTs.set("stringMetadata", stringMetadata);
-        mintedNFTs.set("numericMetadata", numericMetadata);
-        mintedNFTs.set("boolMetadata", boolMetadata);
-        mintedNFTs.set("bornAt", moment().unix());
-        mintedNFTs.set("transferredAt", moment().unix());
+        mintedNFTs.set('nftName', 'genesisNbmon');
+        mintedNFTs.set('contractAddress', genesisContract.address);
+        mintedNFTs.set('tokenId', mintedId);
+        mintedNFTs.set('owner', toAddress);
+        mintedNFTs.set('stringMetadata', stringMetadata);
+        mintedNFTs.set('numericMetadata', numericMetadata);
+        mintedNFTs.set('boolMetadata', boolMetadata);
+        mintedNFTs.set('bornAt', moment().unix());
+        mintedNFTs.set('transferredAt', moment().unix());
 
         // we save the blockchain object (with chain id and name, just in case some blockchains have no name)
         const blockchain = await rpcProvider.getNetwork();
-        mintedNFTs.set("blockchain", blockchain);
+        mintedNFTs.set('blockchain', blockchain);
 
         // after successful minting and setting the variables, we can now save the newly minted NBMon to both our `MintedNFTs` and `nbmonGameData` class.
         await mintedNFTs.save(null, { useMasterKey: true }).then((obj) => {
@@ -118,7 +118,7 @@ const publicMint = async (toAddress) => {
         
         /// NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
         const amountToMint = 1;
-        const stringMetadata = ["", "", "", "", "", "", "", "", ""];
+        const stringMetadata = ['', '', '', '', '', '', '', '', ''];
 		// current hatching duration for testing is temporary. This will be changed to the appropriate number for production.
 		const numericMetadata = [hatchingDuration, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		const boolMetadata = [true];
@@ -149,25 +149,25 @@ const publicMint = async (toAddress) => {
         }
 
         /// Moralis saving-related variables
-        const MintedNFTs = Moralis.Object.extend("MintedNFTs");
+        const MintedNFTs = Moralis.Object.extend('MintedNFTs');
         const mintedNFTs = new MintedNFTs();
 
-        const GameData = Moralis.Object.extend("nbmonGameData");
+        const GameData = Moralis.Object.extend('nbmonGameData');
         const gameData = new GameData();
 
-        mintedNFTs.set("nftName", "Genesis NBMon");
-        mintedNFTs.set("contractAddress", genesisContract.address);
-        mintedNFTs.set("tokenId", mintedId);
-        mintedNFTs.set("owner", toAddress);
-        mintedNFTs.set("stringMetadata", stringMetadata);
-        mintedNFTs.set("numericMetadata", numericMetadata);
-        mintedNFTs.set("boolMetadata", boolMetadata);
-        mintedNFTs.set("bornAt", moment().unix());
-        mintedNFTs.set("transferredAt", moment().unix());
+        mintedNFTs.set('nftName', 'genesisNbmon');
+        mintedNFTs.set('contractAddress', genesisContract.address);
+        mintedNFTs.set('tokenId', mintedId);
+        mintedNFTs.set('owner', toAddress);
+        mintedNFTs.set('stringMetadata', stringMetadata);
+        mintedNFTs.set('numericMetadata', numericMetadata);
+        mintedNFTs.set('boolMetadata', boolMetadata);
+        mintedNFTs.set('bornAt', moment().unix());
+        mintedNFTs.set('transferredAt', moment().unix());
 
         // we save the blockchain object (with chain id and name, just in case some blockchains have no name)
         const blockchain = await rpcProvider.getNetwork();
-        mintedNFTs.set("blockchain", blockchain);
+        mintedNFTs.set('blockchain', blockchain);
 
         // after successful minting and setting the variables, we can now save the newly minted NBMon to both our `MintedNFTs` and `nbmonGameData` class.
         await mintedNFTs.save(null, { useMasterKey: true }).then((obj) => {
