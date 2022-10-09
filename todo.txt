@@ -1,4 +1,3 @@
-- create checkHatchingSignatureValid and invalidateHatchingSignature
 - create generalConfig and config functions for frontend.
 - create `getListingData` and other marketplace functions for `getGenesisNBMon`.
 - make the alt versions of the genesisNBMon functions for Playfab obtaining.
@@ -10,7 +9,10 @@
 - remove console.logs (later on)
 - remove require dotenv and moralis imports from all fiels apart from server.js
 - test if `checkHatchingSignatureValid` works with the decoder after some variables are changed.
+- convert `generalConfig` and `config` to be dynamic and support a `contract` parameter instead of making it in multiple files (meaning that it's not only bound for genesis nbmon contracts).
 - Later on: once more activities apart from genesisMinting and hatching are available, change `addToActivities` to include them.
+- check if each address can mint 5 NBMons or more. If more or less than 5, change `config` to include the new rule.
+- check if each whitelisted address can mint more than 1 NBMon. if yes, change `canMintWhitelisted` to include the new rule.
 
 - IMPORTANT: change ALL genesis testing contract instances (e.g. process.env.GENESIS_NBMON_TESTING_ADDRESS) to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
 and in `getGenesisNBMonOwner` etc where querying in Moralis is needed.
@@ -43,4 +45,9 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 20. `value` is renamed to `txValue` in `UserActivities` class and is now a number type, not a string.
 21. instead of only `nbmonId`, `UserActivities` class now accepts `tokenId`, `nftContractAddress` and `nftName` for further clarity and to accept ALL nfts.
 22. `checkHatchingSignatureValid` now accepts `txHash` instead of `hash` as a parameter.
-23. `checkhatchignSignatureValid` now has a new parameter, `network`, to check for the network that the activity was conducted in.
+23. `checkhatchingSignatureValid` now has a new parameter, `network`, to check for the network that the activity was conducted in.
+24. `generalConfig` now returns `timestamps` instead of `timeStamps` (camel-case change).
+25. `supplies` from `generalConfig` now returns { minted, supplyLimit } instead of { haveBeenMinted, supplyLimit }
+26. `timestamps` now returns { now, publicOpen, whitelistOpen, mintingClosed, isPublicOpen, isWhitelistOpen, isMintingEnded } instead of { now, publicOpenAt, whitelistOpenAt, mintingCloseAt, isWhitelistOpen, isPublicOpen, isMintingEnded }
+27. `hasMintedFive` in `config` now checks if amountMinted >= 5 instead of === 5, just in case somehow users are able to mint more than 5 nbmons.
+28. `canMintUserWhitelisted` is now `canMintWhitelisted`.

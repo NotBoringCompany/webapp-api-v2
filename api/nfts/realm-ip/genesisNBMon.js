@@ -189,15 +189,11 @@ const getGenesisNBMon = async (id) => {
         nbmonData['defenseEffort'] = nbmonGameData['defenseEffort'] === undefined ? null : nbmonGameData['defenseEffort'];
         nbmonData['spDefEffort'] = nbmonGameData['spDefEffort'] === undefined ? null : nbmonGameData['spDefEffort'];
 
-        console.log(nbmonData);
-
         return nbmonData;
     } catch (err) {
         throw err;
     }
 };
-
-getGenesisNBMon(1);
 
 /**
  * `getGenesisNBMonOwner` gets the owner of the Genesis NBMon.
@@ -275,9 +271,159 @@ const getOwnedGenesisNBMonIDs = async (address) => {
     }
 };
 
+/**
+ * @dev `generalConfig` shows the supply and time-related configs for the Genesis NBMon contract.
+ * @return {Object} returns `supplies` which refer to the supply information for Genesis NBMons and `timestamps` which refer to time-related info.
+ */
+const generalConfig = async () => {
+    try {
+        // refers to the total number of Genesis NBMons that can ever be minted
+        const supplyLimit = await genesisContract.maxSupply();
+        // refers to the number of Genesis NBMons that have been minted
+        const minted = parseInt(Number(await genesisContract.totalSupply()));
+        const now = moment().unix();
+        // the unix timestamp of when public minting is open
+        const publicOpen = parseInt(process.env.PUBLIC_MINT_TIME_UNIX);
+        // the unix timestamp of when whitelist minting is opened
+        const whitelistOpen = parseInt(process.env.WHITELIST_MINT_TIME_UNIX);
+        // the unix timestamp of when minting closes in general
+        const mintingClosed = parseInt(process.env.CLOSE_MINT_TIME_UNIX);
+
+        // checks if whitelist minting is currently open
+        const isWhitelistOpen = now >= whitelistOpen && now < mintingClosed;
+        // checks if public minting is currently open
+        const isPublicOpen = now >= publicOpen && now < mintingClosed;
+        // cchecks if minting has ended/is currently closed
+        const isMintingEnded = now > mintingClosed;
+
+        const timestamps = {
+            now,
+            publicOpen,
+            whitelistOpen,
+            mintingClosed,
+            isPublicOpen,
+            isWhitelistOpen,
+            isMintingEnded,
+        };
+        const supplies = { minted, supplyLimit };
+
+        return { timestamps, supplies };
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
+ * `config` uses the config info from `generalConfig ` but is specified to one wallet address.
+ * this includes the ability for an address to mint, if they have exceeded the mint limit etc (their status)
+ * @param {*} address the wallet address of the user
+ * @return {Object} the so-called 'status' of the address along with `generalConfig`'s return value.
+ */
+const config = async (address) => {
+    try {
+        // returns the values from `generalConfig`
+        const generalConfigs = await generalConfig();
+        // checks if the address is blacklisted
+        const isBlacklisted = await genesisContract.checkBlacklisted(address);
+        // checks the amount of Genesis NBMons that the address has minted
+        const amountMinted = await genesisContract.checkAmountMinted(address);
+        // NOTE: This function is currently assuming that EVERY address can mint up to FIVE Genesis NBMons. This is potentially subject to change.
+        // Initially, in our V1 API, this checks if `amountMinted` === 5, but an error can cause a user to mint more than 5.
+        // with >= 5, this means that if the user has minted more than 5, hasMintedFive will automatically return `true`.
+        const hasMintedFive = amountMinted >= 5 ? true : false;
+
+        // if the address is blacklisted, we will manually return the config with these given values.
+        if (isBlacklisted) {
+            const status = {
+                address,
+                canMint: false,
+                isWhitelisted: false,
+                amountMinted,
+                hasMintedFive,
+            };
+
+            return { status, ...generalConfigs };
+        }
+
+        // destructures the object obtained from `generalConfigs`
+        const { minted, supplyLimit } = generalConfigs.supplies;
+        const { isPublicOpen, isWhitelistOpen, isMintingEnded } = generalConfigs.timestamps;
+        // checks if the address is whitelisted
+        const isWhitelisted = await genesisContract.checkWhitelisted(address);
+        // checks if the user has registered their profile in our web app
+        const isProfileRegistered = await genesisContract.profileRegistered(address);
+        // initializes `canMint` to false
+        let canMint = false;
+
+        // if the address has minted 5 or more Genesis NBMons or the minting time has ended, the address cannot mint anymore.
+        if (hasMintedFive || isMintingEnded) {
+            canMint = false;
+        } else {
+            // if the total amount of NBMons minted is still less than the limit
+            if (minted < supplyLimit) {
+                // if the address is whitelisted
+                if (isWhitelisted) {
+                    // checks if `canMintWhitelisted` returns true or false
+                    canMint = canMintWhitelisted(isPublicOpen, isWhitelistOpen, amountMinted, hasMintedFive);
+                } else {
+                    // if the user isn't whitelisted, it checks if public minting is open and if the user hasn't minted five or more NBMons yet
+                    if (isPublicOpen && !hasMintedFive) {
+                        canMint = true;
+                    } else {
+                        canMint = false;
+                    }
+                }
+            }
+        }
+
+        // returns the status of the address with the given variables
+        const status = {
+            address,
+            canMint: canMint && isProfileRegistered,
+            isWhitelisted,
+            amountMinted,
+            isProfileRegistered,
+            hasMintedFive,
+        };
+
+        return { status, ...generalConfigs };
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
+ * `canMintWhitelisted` checks if a whitelisted user is eligible to mint.
+ * NOTE: `hasMintedFive` will be changed accordingly if users can mint more than FIVE NBMONS.
+ * @param {*} isPublicOpen checks if public minting is open
+ * @param {*} isWhitelistOpen checks if whitelist minting is open
+ * @param {*} amountMinted checks the amount of NBMons minted from the user already
+ * @param {*} hasMintedFive checks if the user has minted 5 NBMons
+ * @return {Boolean} returns `true` if the user is eligible to mint, `false` otherwise.
+ */
+const canMintWhitelisted = (isPublicOpen, isWhitelistOpen, amountMinted, hasMintedFive) => {
+    // if whitelist minting isn't open, it returns false
+    if (!isWhitelistOpen) return false;
+
+    // if user hasn't minted yet and public is still closed, they can mint
+    if (amountMinted === 0 && !isPublicOpen) return true;
+
+    // if user has minted once and public is closed, it returns false.
+    // NOTE: this is subject to change as we assume that whitelisted users can only mint once.
+    if (amountMinted === 1 && !isPublicOpen) return false;
+
+    // if user hasn't minted five and public is open, they can mint
+    if (!hasMintedFive && isPublicOpen) return true;
+
+    // otherwise, this gets called. (this most likely will never be called)
+    return false;
+};
+
 module.exports = {
     getGenesisNBMon,
     getGenesisNBMonOwner,
     getOwnedGenesisNBMons,
     getOwnedGenesisNBMonIDs,
+    generalConfig,
+    config,
 };
