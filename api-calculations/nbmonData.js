@@ -1,4 +1,3 @@
-////////////////////// This file serves to retrieve the types of a particular NBMon ///////////////////////
 require('dotenv').config();
 
 const axios = require('axios').default;
@@ -9,7 +8,7 @@ const notionSecret = process.env.NOTION_TOKEN;
 /**
  * `getNBMonData` retrieves the data of the NBMon from our handbuilt Notion database (NBPedia). May include blockchain data.
  * @param {String} genus is the genus of the NBMon (e.g. Lamox, Licorine etc.)
- * @returns {Object} an object containing the NBMon's data.
+ * @return {Object} an object containing the NBMon's data.
  */
 const getNBMonData = async (genus) => {
     try {
@@ -22,7 +21,7 @@ const getNBMonData = async (genus) => {
                 'Behavior': null,
                 'Habitat': null,
                 'Intended Playstyle': null,
-                'Base Stats': null  
+                'Base Stats': null,
             };
         }
 
@@ -32,8 +31,8 @@ const getNBMonData = async (genus) => {
             url: `https://api.notion.com/v1/databases/${nbpedia}/query`,
             headers: {
                 'Notion-Version': '2022-06-28',
-                'Authorization': notionSecret
-            }
+                'Authorization': notionSecret,
+            },
         };
 
         // response will return the entire notion database in JSON format.
@@ -49,7 +48,7 @@ const getNBMonData = async (genus) => {
         });
 
         const results = response.data.results;
-        let types = [];
+        const types = [];
         let summary;
         let species;
         let behavior;
@@ -61,7 +60,7 @@ const getNBMonData = async (genus) => {
             // case-insensitive search
             if (result.properties['Official Name'].title[0].plain_text.toLowerCase() === genus.toLowerCase()) {
                 // we check if Notion has the correct amount of types for the NBMon (at least 1).
-                let amountOfTypes = result.properties.Types.multi_select.length;
+                const amountOfTypes = result.properties.Types.multi_select.length;
                 if (amountOfTypes === 0) {
                     throw new Error('This NBMon does not have any types added on Notion. Please add at least 1 type.');
                 } else if (amountOfTypes === 1) {
@@ -69,7 +68,7 @@ const getNBMonData = async (genus) => {
                 } else if (amountOfTypes === 2) {
                     types.push(result.properties.Types.multi_select[0].name);
                     types.push(result.properties.Types.multi_select[1].name);
-                // if there are more than 2 types, then the NBMon needs to be changed to have a maximum of only 2 types to not damage the whole code structure.
+                // if there are more than 2 types, an error is thrown since it's impossible or a human error.
                 } else if (amountOfTypes >= 3) {
                     throw new Error('An NBMon cannot have more than 2 types. Please check the Notion database and fix this.');
                 }
@@ -90,7 +89,7 @@ const getNBMonData = async (genus) => {
 
                 // we now obtain the behavior of the NBMon.
                 if (result.properties.Behavior.select === null) {
-                    behavior = 'No behavior specified yet.'
+                    behavior = 'No behavior specified yet.';
                 } else {
                     behavior = result.properties.Behavior.select.name;
                 }
@@ -128,11 +127,11 @@ const getNBMonData = async (genus) => {
             'Behavior': behavior,
             'Habitat': habitat,
             'Intended Playstyle': intendedPlaystyle,
-            'Base Stats': baseStats
-        }
+            'Base Stats': baseStats,
+        };
     } catch (err) {
         throw err;
     }
-}
+};
 
 module.exports = { getNBMonData };

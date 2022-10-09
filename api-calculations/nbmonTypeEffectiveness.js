@@ -1,4 +1,3 @@
-/////////////////////// This utils file is used to calculate the type effectiveness of NBMons ///////////////////////
 require('dotenv').config();
 
 const axios = require('axios').default;
@@ -10,9 +9,9 @@ const notionSecret = process.env.NOTION_TOKEN;
  * @dev These are all the available types of NBMons.
  * These are organized in this manner based on the Types table/damage multiplier from Notion.
  * The syntax to obtain the type TITLE is as follows:
- * 
+ *
  * (from axios post response): response.data.results[xyz].properties['Atk (Y) /Def (X)'].title[0].rich_text
- * 
+ *
  * where xyz is the index of the type, starting from 0.
  * Reptile is 0, and Water is 14.
  */
@@ -31,14 +30,14 @@ const allTypes = [
     'Fire',
     'Earth',
     'Electric',
-    'Water'
+    'Water',
 ];
 
 /**
  * `getAttackEffectiveness` gets the attack effectiveness of the NBMon against other types.
  * @param {String} firstType is the first type of the NBMon.
  * @param {String} secondType is the second type of the NBMon (if not empty/null).
- * @returns {Object} an object containing what the NBMon is strong or weak against attack-wise.
+ * @return {Object} an object containing what the NBMon is strong or weak against attack-wise.
  */
 const getAttackEffectiveness = async (firstType, secondType) => {
     try {
@@ -46,8 +45,8 @@ const getAttackEffectiveness = async (firstType, secondType) => {
         if (firstType === undefined || firstType === null || firstType === '') {
             return {
                 'Strong against': [],
-                'Weak against': []
-            }
+                'Weak against': [],
+            };
         }
 
         // if second type is empty, we force it to become null.
@@ -61,8 +60,8 @@ const getAttackEffectiveness = async (firstType, secondType) => {
             url: `https://api.notion.com/v1/databases/${typesTable}/query`,
             headers: {
                 'Notion-Version': '2022-06-28',
-                'Authorization': notionSecret
-            }
+                'Authorization': notionSecret,
+            },
         };
 
         // response will return the entire notion database in JSON format.
@@ -79,31 +78,32 @@ const getAttackEffectiveness = async (firstType, secondType) => {
 
         // we will return the index of the respective types from the `allTypes` array when querying the response obtained above.
         // note the extra check `toLowerCase`. This is to make the type search case-insensitive.
-        const firstTypeIndex = allTypes.findIndex(type => type.toLowerCase() === firstType.toLowerCase());
-        const secondTypeIndex = secondType !== null ? allTypes.findIndex(type => type.toLowerCase() === secondType.toLowerCase()) : -1;
+        const firstTypeIndex = allTypes.findIndex((type) => type.toLowerCase() === firstType.toLowerCase());
+        const secondTypeIndex = secondType !== null ? allTypes.findIndex((type) => type.toLowerCase() === secondType.toLowerCase()) : -1;
 
-        // now, we get all the attack multipliers to find the attack effectiveness for the first type. this is done by doing a for loop on the `allTypes` array.
+        // now, we get all the attack multipliers to find the attack effectiveness for the first type.
+        // this is done by doing a for loop on the `allTypes` array.
         // strong against are the types that the first type is strong against (attack wise).
         // weak against are the types that the first type is weak against (attack wise).
-        // the calculation is as follows: if the multiplier is more than 1, then it is strong against that type. if the multiplier is less than 1, then it is weak against that type.
-        let strongAgainst = [];
-        let weakAgainst = [];
+        // the calculation is as follows: if the multiplier is more than 1, then it is strong against that type.
+        // if the multiplier is less than 1, then it is weak against that type.
+        const strongAgainst = [];
+        const weakAgainst = [];
 
         if (secondType === null) {
             allTypes.forEach((type) => {
                 // first we check if the multiplier array is empty. if it is, then it's counted as 1. if not, we will get `rich_text[0].plain_text`.
                 let multiplier = response.data.results[firstTypeIndex].properties[type].rich_text;
-    
+
                 if (multiplier.length === 0 || multiplier === undefined || multiplier === null) {
                     multiplier = 1;
                 } else {
                     multiplier = parseFloat(response.data.results[firstTypeIndex].properties[type].rich_text[0].plain_text) / 100;
                 }
-    
+
                 // if multiplier is less than 1, then this type is weak against that type (attack wise), otherwise it is strong against it.
                 if (multiplier < 1) {
                     weakAgainst.push(type);
-    
                 } else if (multiplier > 1) {
                     strongAgainst.push(type);
                 }
@@ -140,29 +140,29 @@ const getAttackEffectiveness = async (firstType, secondType) => {
 
         return {
             'Strong against': strongAgainst,
-            'Weak against': weakAgainst
+            'Weak against': weakAgainst,
         };
     } catch (err) {
         throw err;
     }
-}
+};
 
 /**
  * `getDefenseEffectiveness` gets the defense effectiveness of the NBMon against other types.
  * NOTE: For this function, please enter the types with proper casing (i.e. Reptile, not reptile, rEpTile, or anything else.)
  * @param {String} firstType is the first type of the NBMon.
  * @param {String} secondType is the second type of the NBMon (if not empty/null).
- * @returns {Object} an object containing what the NBMon is resistant or vulnerable to defense-wise.
+ * @return {Object} an object containing what the NBMon is resistant or vulnerable to defense-wise.
  */
 const getDefenseEffectiveness = async (firstType, secondType) => {
     try {
         if (firstType === undefined || firstType === null || firstType === '') {
             return {
                 'Resistant to': [],
-                'Vulnerable to': []
-            }
+                'Vulnerable to': [],
+            };
         }
-        
+
         // if second type is empty, we force it to become null.
         if (secondType === undefined || secondType === null || secondType === '') {
             secondType = null;
@@ -174,8 +174,8 @@ const getDefenseEffectiveness = async (firstType, secondType) => {
             url: `https://api.notion.com/v1/databases/${typesTable}/query`,
             headers: {
                 'Notion-Version': '2022-06-28',
-                'Authorization': notionSecret
-            }
+                'Authorization': notionSecret,
+            },
         };
 
         // response will return the entire notion database in JSON format.
@@ -190,14 +190,17 @@ const getDefenseEffectiveness = async (firstType, secondType) => {
             }
         });
 
-        // now, we get all the defense multipliers to find the defense effectiveness for the first type. this is done by doing a for loop on the `allTypes` array.
+        // now, we get all the defense multipliers to find the defense effectiveness for the first type.
+        // this is done by doing a for loop on the `allTypes` array.
         // resistant to are the types that the first type is resistant to (defense wise).
         // vulnerable to are the types that the first type is vulnerable to (defense wise).
-        // the calculation is as follows: if the multiplier is less than 1, then it is resistant to that type. if the multiplier is more than 1, then it is vulnerable to that type.
-        let resistantTo = [];
-        let vulnerableTo = [];
+        // the calculation is as follows:
+        // if the multiplier is less than 1, then it is resistant to that type. if the multiplier is more than 1, then it is vulnerable to that type.
+        const resistantTo = [];
+        const vulnerableTo = [];
 
-        // the query for the multiplier is slightly different than `getAttackEffectiveness`. in `getAttackEffectiveness`, the multiplier is searched by using this syntax:
+        // the query for the multiplier is slightly different than `getAttackEffectiveness`.
+        // in `getAttackEffectiveness`, the multiplier is searched by using this syntax:
         // response.data.results[TYPE INDEX OF HERE].properties[ATTACKING TYPE].rich_text[0].plain_text (assuming rich_text is not empty).
         // the syntax will be the same, but slightly changed in order:
         // response.data.results[ATTACKING TYPE].properties[DEFENDING TYPE NAME].rich_text[0].plain_text.
@@ -210,7 +213,7 @@ const getDefenseEffectiveness = async (firstType, secondType) => {
                 // if let's say the `type` is a Reptile and the NBMon is an Ordinary type, the multiplier will return 0.75.
                 // this means that the Reptile is weak against the NBMon (attack wise), and the NBMon is resistant to the Reptile (defense wise).
                 let multiplier = response.data.results[index].properties[firstType].rich_text;
-                
+
                 if (multiplier.length === 0 || multiplier === undefined || multiplier === null) {
                     multiplier = 1;
                 } else {
@@ -255,14 +258,14 @@ const getDefenseEffectiveness = async (firstType, secondType) => {
 
         return {
             'Resistant to': resistantTo,
-            'Vulnerable to': vulnerableTo
+            'Vulnerable to': vulnerableTo,
         };
     } catch (err) {
         throw err;
     }
-}
+};
 
 module.exports = {
     getAttackEffectiveness,
-    getDefenseEffectiveness
-}
+    getDefenseEffectiveness,
+};
