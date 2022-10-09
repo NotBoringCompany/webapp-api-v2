@@ -196,6 +196,45 @@ const getGenesisNBMon = async (id) => {
 };
 
 /**
+ * `changeOwnership` changes the ownership of a Genesis NBMon.
+ * NOTE: `safeTransferFrom` NEEDS TO BE CALLED FROM FRONTEND BEFOREHAND!
+ * You are essentially able to also change ownership by using the `safeTransferFrom` option from the Genesis NBMon smart contract, however:
+ * Most of our functions will query our Moralis Database (which currently isn't actively and dynamically following the smart contract events/changes).
+ * This means that if someone calls `safeTransferFrom`, Moralis will not change the ownership in their class unless we do it manually.
+ * This function serves to change the ownership at the same time in the Moralis class, only after `safeTransferFrom` is called from the frontend.
+ * This ensures that the ownership of the NBMon is changed both in the backend and smart contract level.
+ * OTHERWISE: If a player only calls `safeTransferFrom`, there is a risk of ownership discrepancy and information may be altered. Huge risk.
+ * @param {Number} nbmonId the Genesis NBMon ID
+ * @param {String} toAddress the address to change the ownership to
+ * @return {Object} an object with `Status: OK` if successful.
+ */
+const changeOwnership = async (nbmonId, toAddress) => {
+    try {
+        // we query the MintedNFTs class in Moralis
+        const MintedNFTs = new Moralis.Query('MintedNFTs');
+        // we ensure that the query is set to the Genesis NBMon contract and the respective NBMon ID
+        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        MintedNFTs.equalTo('tokenId', nbmonId);
+
+        const result = await MintedNFTs.first({ useMasterKey: true });
+
+        if (result === undefined) {
+            throw new Error('Genesis NBMon with given ID not found.');
+        }
+
+        // now, we set the owner to the new `toAddress` and save it.
+        result.set('owner', toAddress);
+        result.save(null, { useMasterKey: true });
+
+        return {
+            status: 'OK',
+        };
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
  * `getGenesisNBMonOwner` gets the owner of the Genesis NBMon.
  * @param {Number} id the ID of the Genesis NBMon.
  * @return {string} the address of the owner.
@@ -316,7 +355,7 @@ const generalConfig = async () => {
 /**
  * `config` uses the config info from `generalConfig ` but is specified to one wallet address.
  * this includes the ability for an address to mint, if they have exceeded the mint limit etc (their status)
- * @param {*} address the wallet address of the user
+ * @param {String} address the wallet address of the user
  * @return {Object} the so-called 'status' of the address along with `generalConfig`'s return value.
  */
 const config = async (address) => {
@@ -395,10 +434,10 @@ const config = async (address) => {
 /**
  * `canMintWhitelisted` checks if a whitelisted user is eligible to mint.
  * NOTE: `hasMintedFive` will be changed accordingly if users can mint more than FIVE NBMONS.
- * @param {*} isPublicOpen checks if public minting is open
- * @param {*} isWhitelistOpen checks if whitelist minting is open
- * @param {*} amountMinted checks the amount of NBMons minted from the user already
- * @param {*} hasMintedFive checks if the user has minted 5 NBMons
+ * @param {Boolean} isPublicOpen checks if public minting is open
+ * @param {Boolean} isWhitelistOpen checks if whitelist minting is open
+ * @param {Number} amountMinted checks the amount of NBMons minted from the user already
+ * @param {Boolean} hasMintedFive checks if the user has minted 5 NBMons
  * @return {Boolean} returns `true` if the user is eligible to mint, `false` otherwise.
  */
 const canMintWhitelisted = (isPublicOpen, isWhitelistOpen, amountMinted, hasMintedFive) => {
@@ -426,4 +465,5 @@ module.exports = {
     getOwnedGenesisNBMonIDs,
     generalConfig,
     config,
+    changeOwnership,
 };
