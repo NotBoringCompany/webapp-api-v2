@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 const AWS = require('aws-sdk');
-const Moralis = require('moralis-v1/node');
 const moment = require('moment');
 
 // IMPORTS
@@ -14,15 +13,15 @@ const s3 = new AWS.S3({
     endpoint: spacesEndpoint.href,
     credentials: new AWS.Credentials({
         accessKeyId: process.env.SPACES_KEY,
-        secretAccessKey: process.env.SPACES_SECRET
-    })
+        secretAccessKey: process.env.SPACES_SECRET,
+    }),
 });
 
 /**
  * @dev `uploadGenesisEggMetadata` uploads the metadata of a Genesis NBMon egg to DigitalOcean Spaces. Contains mostly empty stats/attributes.
  * Used primarily for OpenSea metadata retrieval or any similar metadata-friendly NFT marketplaces.
  * @param {Number} id the ID of the Genesis NBMon to upload.
- * @returns {Object} an object with a status of 'OK' if successful, or an error thrown otherwise.
+ * @return {Object} an object with a status of 'OK' if successful, or an error thrown otherwise.
  */
 const uploadGenesisEggMetadata = (id) => {
     // contains the metadata of the genesis egg
@@ -37,15 +36,15 @@ const uploadGenesisEggMetadata = (id) => {
                 trait_type: 'Born on',
                 // this value might be slightly different than the one during minting. this is normal on async operations but should
                 // only have a discrepancy of up to a few seconds, no more.
-                value: moment().unix()
+                value: moment().unix(),
             },
             {
                 display_type: 'date',
                 trait_type: 'Hatchable on',
-                // note: the value after the + sign is the hatching duration in seconds. 
-                value: moment().unix() + hatchingDuration
-            }
-        ]
+                // note: the value after the + sign is the hatching duration in seconds.
+                value: moment().unix() + hatchingDuration,
+            },
+        ],
     };
 
     // this will create a new object in the DigitalOcean Spaces bucket with the metadata of the Genesis NBMon egg.
@@ -54,22 +53,22 @@ const uploadGenesisEggMetadata = (id) => {
         Key: `genesisNBMon/${id}.json`,
         Body: JSON.stringify(metadata),
         ACL: 'public-read',
-        ContentType: 'application/json'
+        ContentType: 'application/json',
     }, (err) => {
         if (err) console.log('Error in uploading to S3 Bucket, message: ', err.message);
         if (err) throw err;
     });
 
     return {
-        status: 'OK'
+        status: 'OK',
     };
-}
+};
 
 /**
- * `uploadGenesisHatchedMetadata` uploads the metadata of a hatched Genesis NBMon to DigitalOcean Spaces. 
+ * `uploadGenesisHatchedMetadata` uploads the metadata of a hatched Genesis NBMon to DigitalOcean Spaces.
  * Contains the stats/attributes of the hatched NBMon.
  * @param {Number} id the ID of the Genesis NBMon to upload.
- * @returns {Object} an object with a status of 'OK' if successful, or an error thrown otherwise.
+ * @return {Object} an object with a status of 'OK' if successful, or an error thrown otherwise.
  */
 const uploadGenesisHatchedMetadata = async (id) => {
     try {
@@ -78,14 +77,12 @@ const uploadGenesisHatchedMetadata = async (id) => {
         const nbmon = await getGenesisNBMon(id);
         const genus = nbmon['genus'];
         const genusDescription = nbmon['genusDescription'];
-        let isEgg;
+
         // here we double check and see if the nbmon is still an egg. if it is, we throw an error as something is wrong with hatching.
-        // this is important as we've removed the database to check for hatched NBMons as it is deemed redundant. so this serves as the function's only
-        // check to see if the nbmon is already hatched or not.
+        // this is important as we've removed the database to check for hatched NBMons as it is deemed redundant.
+        // so this serves as the function's only check to see if the nbmon is already hatched or not.
         if (nbmon['isEgg']) {
             throw new Error('NBMon is still an egg. Cannot upload hatched metadata.');
-        } else {
-            isEgg = nbmon['isEgg'];
         }
 
         // here we insert the new hatched metadata of the nbmon to upload to DigitalOcean Spaces.
@@ -97,20 +94,20 @@ const uploadGenesisHatchedMetadata = async (id) => {
                 {
                     display_type: 'date',
                     trait_type: 'Hatched on',
-                    value: nbmon['hatchedAt']
+                    value: nbmon['hatchedAt'],
                 },
                 {
                     trait_type: 'First Type',
-                    value: nbmon['types'][0]
+                    value: nbmon['types'][0],
                 },
                 {
                     trait_type: 'Second Type',
-                    value: nbmon['types'][1]
+                    value: nbmon['types'][1],
                 },
                 {
                     display_type: 'number',
                     trait_type: 'Health Potential',
-                    value: nbmon['healthPotential']
+                    value: nbmon['healthPotential'],
                 },
                 {
                     display_type: 'number',
@@ -153,29 +150,29 @@ const uploadGenesisHatchedMetadata = async (id) => {
             ],
         };
 
-    // notice how we aren't deleting the existing egg metadata uploaded to Spaces first before reuploading the hatched metadata.
-    //This is because S3 does it automatically for us.
-    s3.putObject(
-        {
-            Bucket: process.env.SPACES_NAME,
-            Key: `genesisNBMon/${id}.json`,
-            Body: JSON.stringify(metadata),
-            ACL: 'public-read',
-            ContentType: 'application/json',
-        }, (err) => {
-            if (err) console.log('Error in uploading to S3 Bucket, message: ', err.message);
-            if (err) throw err;
-        });
+        // notice how we aren't deleting the existing egg metadata uploaded to Spaces first before reuploading the hatched metadata.
+        // This is because S3 does it automatically for us.
+        s3.putObject(
+            {
+                Bucket: process.env.SPACES_NAME,
+                Key: `genesisNBMon/${id}.json`,
+                Body: JSON.stringify(metadata),
+                ACL: 'public-read',
+                ContentType: 'application/json',
+            }, (err) => {
+                if (err) console.log('Error in uploading to S3 Bucket, message: ', err.message);
+                if (err) throw err;
+            });
 
         return {
-            status: 'OK'
+            status: 'OK',
         };
     } catch (err) {
         throw err;
     }
-}
+};
 
 module.exports = {
     uploadGenesisEggMetadata,
     uploadGenesisHatchedMetadata,
-}
+};

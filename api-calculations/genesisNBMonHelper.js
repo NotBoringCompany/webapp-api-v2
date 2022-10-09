@@ -11,13 +11,13 @@ const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, '../abi/GenesisNBMon.json')
-    )
+        path.join(__dirname, '../abi/GenesisNBMon.json'),
+    ),
 );
 const genesisContract = new ethers.Contract(
     process.env.GENESIS_NBMON_TESTING_ADDRESS,
     genesisABI,
-    rpcProvider
+    rpcProvider,
 );
 
 const parseJSON = require('../utils/jsonParser').parseJSON;
@@ -26,37 +26,37 @@ const parseJSON = require('../utils/jsonParser').parseJSON;
  * `getGenesisFertilityDeduction` checks for the fertility point deduction of a Genesis NBMon after it has bred.
  * This will be different than other NBMon generations.
  * @param {String} rarity the rarity of the NBMon.
- * @returns {Number} the fertility point deduction.
+ * @return {Number} the fertility point deduction.
  */
 const getGenesisFertilityDeduction = (rarity) => {
     switch (rarity) {
-        case 'Common':
-            return 1000;
-        case 'Uncommon':
-            return 750;
-        case 'Rare':
-            return 600;
-        case 'Epic':
-            return 500;
-        case 'Legendary':
-            return 375;
-        case 'Mythical':
-            return 300;
-        case undefined:
-            return null;
-        case null:
-            return null;
-        case '':
-            return null;
-        default:
-            throw new Error('Invalid rarity.');
+    case 'Common':
+        return 1000;
+    case 'Uncommon':
+        return 750;
+    case 'Rare':
+        return 600;
+    case 'Epic':
+        return 500;
+    case 'Legendary':
+        return 375;
+    case 'Mythical':
+        return 300;
+    case undefined:
+        return null;
+    case null:
+        return null;
+    case '':
+        return null;
+    default:
+        throw new Error('Invalid rarity.');
     }
-}
+};
 
 /**
- * `getBornAt` gets the birth timestamp of a genesis NBMon (in unix time). This method uses blockchain, which will take noticeably longer than Moralis.
+ * `getBornAt` gets the birth timestamp of a genesis NBMon (in unix time). This method uses blockchain, which will take longer than Moralis.
  * @param {Number} nbmonId the ID of the NBMon
- * @returns {Number} the unix birth timestamp of the genesis NBMon.
+ * @return {Number} the unix birth timestamp of the genesis NBMon.
  */
 const getBornAt = async (nbmonId) => {
     try {
@@ -65,7 +65,7 @@ const getBornAt = async (nbmonId) => {
     } catch (err) {
         throw err;
     }
-}
+};
 
 const serverUrl = process.env.MORALIS_SERVERURL;
 const appId = process.env.MORALIS_APPID;
@@ -74,14 +74,14 @@ const masterKey = process.env.MORALIS_MASTERKEY;
 /**
  * `getBornAt` gets the birth timestamp of a genesis NBMon (in unix time). This method uses Moralis, which results in a faster query.
  * @param {Number} nbmonId the ID of the NBMon
- * @returns {Number} the unix birth timestamp of the genesis NBMon.
+ * @return {Number} the unix birth timestamp of the genesis NBMon.
  */
 const getBornAtAlt = async (nbmonId) => {
     try {
-        await Moralis.start({ 
+        await Moralis.start({
             serverUrl,
             appId,
-            masterKey
+            masterKey,
         });
         const MintedNFTs = new Moralis.Query('MintedNFTs');
         MintedNFTs.equalTo('tokenId', nbmonId);
@@ -100,10 +100,11 @@ const getBornAtAlt = async (nbmonId) => {
     } catch (err) {
         throw err;
     }
-}
+};
 
-module.exports = { 
+module.exports = {
     getGenesisFertilityDeduction,
     getBornAt,
-    getBornAtAlt
+    getBornAtAlt,
 };
+
