@@ -24,5 +24,9 @@
     "moralis-v1": "^1.11.0",
     "nodemon": "^2.0.20",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "eslint": "^8.24.0",
+    "eslint-config-google": "^0.14.0"
   }
 }

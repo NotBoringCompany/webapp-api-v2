@@ -10,6 +10,7 @@
 - remove console.logs (later on)
 - remove require dotenv and moralis imports from all fiels apart from server.js
 - test if `checkHatchingSignatureValid` works with the decoder after some variables are changed.
+- Later on: once more activities apart from genesisMinting and hatching are available, change `addToActivities` to include them.
 
 - IMPORTANT: change ALL genesis testing contract instances (e.g. process.env.GENESIS_NBMON_TESTING_ADDRESS) to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
 and in `getGenesisNBMonOwner` etc where querying in Moralis is needed.

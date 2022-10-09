@@ -1,0 +1,26 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": "google",
+    "overrides": [
+        {
+            "files": ["**/*.ts", "**/*.tsx"],
+            "rules": {
+              "camelcase": ["off"]
+            }
+          }
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "indent": ["error", 4],
+        "max-len": ["error", { "code": 150 }],
+        "camelcase": ["error", {"properties": "never"}],
+        "object-curly-spacing": ["error", "always"],
+        "linebreak-style": ["error", "windows"]
+    }
+}

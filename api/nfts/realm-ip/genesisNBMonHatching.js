@@ -7,7 +7,6 @@ const Moralis = require('moralis-v1/node');
 const crypto = require('crypto');
 
 const privateKey = process.env.TEST_ADMIN_PRIVATE_KEY;
-const hatchingDuration = process.env.HATCHING_DURATION;
 
 const minterWallet = new ethers.Wallet(privateKey);
 const rpcUrl = process.env.CRONOS_RPC_URL;
@@ -18,18 +17,17 @@ const statRandomizer = require('../../../api-calculations/nbmonBlockchainStats.j
 const { getNBMonData } = require('../../../api-calculations/nbmonData.js');
 const { getBornAtAlt } = require('../../../api-calculations/genesisNBMonHelper.js');
 const { saveHatchingSignature } = require('./activities.js');
-const { resourceLimits } = require('worker_threads');
 
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, '../../../abi/GenesisNBMon.json')
-    )
+        path.join(__dirname, '../../../abi/GenesisNBMon.json'),
+    ),
 );
 const genesisContract = new ethers.Contract(
     process.env.GENESIS_NBMON_TESTING_ADDRESS,
     genesisABI,
-    rpcProvider
+    rpcProvider,
 );
 
 /**
@@ -38,7 +36,7 @@ const genesisContract = new ethers.Contract(
  * @param {Number} nbmonId the ID of the Genesis NBMon
  * @param {String} minter the minter's address
  * @param {Number} bornAt the unix timestamp/block timestamp of when the NBMon was born
- * @returns {Object} an object containing both signature and tx salt
+ * @return {Object} an object containing both signature and tx salt
  */
 const generateSignature = async (nbmonId, minter, bornAt) => {
     // generates a random salt string from the crypto library, used for hashing.
@@ -49,7 +47,7 @@ const generateSignature = async (nbmonId, minter, bornAt) => {
         nbmonId,
         minter,
         bornAt,
-        txSalt
+        txSalt,
     );
 
     // the hash is currently considered as a string message. in order to obtain the proper bytes32 format, we need the Uint8Array format of the hash,
@@ -59,7 +57,7 @@ const generateSignature = async (nbmonId, minter, bornAt) => {
     const signature = await minterWallet.signMessage(arrayifiedHash);
 
     return { signature, txSalt };
-}
+};
 
 /**
  * `randomizeHatchingStats` obtains all the data from `api-calculations/nbmonBlockchainStats.js` to randomize the NBMon-to-hatch's blockchain stats.
@@ -69,8 +67,10 @@ const generateSignature = async (nbmonId, minter, bornAt) => {
  */
 const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
     try {
-        /// Note: Notice how for most of the parameter-dependent code, we don't check for errors. This is because the error handling with error throws is already
-        /// done inside these methods, so no need for extra checks here.
+        // Note: Notice how for most of the parameter-dependent code, we don't check for errors.
+        // This is because the error handling with error throws is already
+        // done inside these methods, so no need for extra checks here.
+
         // we get the wallet object of the minter
         const minter = new ethers.Wallet(privateKey, rpcProvider);
 
@@ -81,7 +81,7 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
         const mutation = await statRandomizer.randomizeGenesisMutation(genus);
         const species = 'Origin';
         const fertility = 3000;
-        
+
         // getting nbmon data based on genus
         const nbmonData = await getNBMonData(genus);
 
@@ -95,20 +95,20 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
 
         const [
             healthPotential,
-			energyPotential,
-			atkPotential,
-			defPotential,
-			spAtkPotential,
-			spDefPotential,
-			speedPotential,
+            energyPotential,
+            atkPotential,
+            defPotential,
+            spAtkPotential,
+            spDefPotential,
+            speedPotential,
         ] = [
             potential[0],
-			potential[1],
-			potential[2],
-			potential[3],
-			potential[4],
-			potential[5],
-			potential[6],
+            potential[1],
+            potential[2],
+            potential[3],
+            potential[4],
+            potential[5],
+            potential[6],
         ];
 
         const passives = await statRandomizer.randomizePassives();
@@ -126,20 +126,20 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
             typeOne,
             typeTwo,
             passiveOne,
-            passiveTwo
+            passiveTwo,
         ];
 
         const numericMetadata = [
             0,
             healthPotential,
-			energyPotential,
-			atkPotential,
-			defPotential,
-			spAtkPotential,
-			spDefPotential,
-			speedPotential,
-			fertility,
-			hatchedTimestamp,
+            energyPotential,
+            atkPotential,
+            defPotential,
+            spAtkPotential,
+            spDefPotential,
+            speedPotential,
+            fertility,
+            hatchedTimestamp,
         ];
 
         const boolMetadata = [false];
@@ -156,7 +156,7 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
             signature,
             stringMetadata,
             numericMetadata,
-            boolMetadata
+            boolMetadata,
         );
 
         const signedTx = await minter.signTransaction(unsignedTx);
@@ -166,30 +166,31 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
 
         return {
             response: minedTx,
-            signature: signature
-        }
+            signature: signature,
+        };
     } catch (err) {
         throw err;
     }
-}
+};
 
 /**
- * `updateHatchedNBMon` updates the NBMon's blockchain data in Moralis. Since previously after the NBMon was minted it gets added to Moralis, we now also 
+ * `updateHatchedNBMon` updates the NBMon's blockchain data in Moralis.
+ * Since previously after the NBMon was minted it gets added to Moralis, we now also
  * need to update the data in Moralis after the NBMon hatches in the blockchain to reflect its new data.
  * @param {Number} nbmonId the ID of the Genesis NBMon
- * @returns {Object} an Object that shows 'OK' if the update is successful.
+ * @return {Object} an Object that shows 'OK' if the update is successful.
  */
 const updateHatchedNBMon = async (nbmonId) => {
     try {
         // we get the nbmon from the blockchain.
-        // Note: IMPORTANT. the nbmon needs to already be hatched and have its stats updated in the blockchain prior to this, or else the updated stats will either
-        // remain the same, or worse, be completely off.
+        // Note: IMPORTANT. the nbmon needs to already be hatched and have its stats updated in the blockchain prior to this,
+        // or else the updated stats will either remain the same, or worse, be completely off.
         const nbmon = await genesisContract.getNFT(nbmonId);
         const stringMetadata = nbmon[7];
         const numericMetadata = nbmon[8];
 
-        // the numeric metadata obtained above will be in BigNumber format, which means that it needs to be converted to a Number before updating it to Moralis.
-        let convertedNumericMetadata = [];
+        // the numeric metadata obtained above will be in BigNumber format, which needs to be converted to a Number before updating it to Moralis.
+        const convertedNumericMetadata = [];
 
         numericMetadata.forEach((metadata) => {
             const converted = parseInt(Number(metadata));
@@ -216,17 +217,17 @@ const updateHatchedNBMon = async (nbmonId) => {
         await genesisNBMon.save(null, { useMasterKey: true });
 
         return {
-            status: 'OK'
-        }
+            status: 'OK',
+        };
     } catch (err) {
         throw err;
     }
-}
+};
 
 module.exports = {
     generateSignature,
     randomizeHatchingStats,
-    updateHatchedNBMon
-}
+    updateHatchedNBMon,
+};
 
 

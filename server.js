@@ -14,13 +14,13 @@ const masterKey = process.env.MORALIS_MASTERKEY;
 app.use(cors());
 app.use(express.json());
 
-app.listen(port, async() => {
+app.listen(port, async () => {
     console.log(`Listening from port ${port}`);
-    
+
     // initiates a moralis instance
-    await Moralis.start({ 
+    await Moralis.start({
         serverUrl,
         appId,
-        masterKey
+        masterKey,
     });
 });
