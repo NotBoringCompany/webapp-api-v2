@@ -52,3 +52,4 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 27. `hasMintedFive` in `config` now checks if amountMinted >= 5 instead of === 5, just in case somehow users are able to mint more than 5 nbmons.
 28. `canMintUserWhitelisted` is now `canMintWhitelisted`.
 29. `changeGenesisNBMonOwnership` is now `changeOwnership`. It also calls `safeTransferFrom` from the contract as well now.
+30. `addMonthlyTradingVolume` now accepts `address` instead of `ethAddress` as a param.

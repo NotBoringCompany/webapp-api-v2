@@ -16,7 +16,7 @@ const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 const statRandomizer = require('../../api-calculations/nbmonBlockchainStats.js');
 const { getNBMonData } = require('../../api-calculations/nbmonData.js');
 const { getBornAtAlt } = require('../../api-calculations/genesisNBMonHelper.js');
-const { saveHatchingSignature } = require('../activities.js');
+const { saveHatchingSignature } = require('../webapp/activities.js');
 
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(

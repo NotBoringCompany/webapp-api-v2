@@ -11,7 +11,7 @@ const genesisABI = require(`${__dirname}/../abi/GenesisNBMon.json`);
 const decoder = new InputDataDecoder(genesisABI);
 
 const Moralis = require('moralis-v1/node');
-const { parseJSON } = require('../utils/jsonParser');
+const { parseJSON } = require('../../utils/jsonParser');
 
 /**
  * `saveHatchingSignature` saves the newly generated hatching signature of ANY hatchable NFT (not only NBMons) to Moralis.
