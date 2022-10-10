@@ -1,2 +1,2 @@
-### Not Boring Company's official Web App API (V2)
+# Not Boring Company's official Web App API (V2)
 ## Note: Our current web app ONLY supports EVM chains. Support for Non-EVM chains such as Solana, NEAR and so on will be implemented in the near future.
