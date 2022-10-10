@@ -6,11 +6,12 @@ require('dotenv').config();
 // Ethereum Decoder to try and match the hash obtained from the
 // blockchain data hashes, such as in `checkHatchingSignatureValid`.
 const InputDataDecoder = require('ethereum-input-data-decoder');
-const genesisABI = require(`${__dirname}/../../../abi/GenesisNBMon.json`);
+const genesisABI = require(`${__dirname}/../abi/GenesisNBMon.json`);
+
 const decoder = new InputDataDecoder(genesisABI);
 
 const Moralis = require('moralis-v1/node');
-const { parseJSON } = require('../../../utils/jsonParser');
+const { parseJSON } = require('../utils/jsonParser');
 
 /**
  * `saveHatchingSignature` saves the newly generated hatching signature of ANY hatchable NFT (not only NBMons) to Moralis.

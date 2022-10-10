@@ -1,4 +1,3 @@
-- create generalConfig and config functions for frontend.
 - create `getListingData` and other marketplace functions for `getGenesisNBMon`.
 - make the alt versions of the genesisNBMon functions for Playfab obtaining.
 - Create addToActivities, import to genesisNBMonMinting API
