@@ -13,17 +13,18 @@ const rpcUrl = process.env.CRONOS_RPC_URL;
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
 // IMPORTS
-const statRandomizer = require('../../../api-calculations/nbmonBlockchainStats.js');
-const { getNBMonData } = require('../../../api-calculations/nbmonData.js');
-const { getBornAtAlt } = require('../../../api-calculations/genesisNBMonHelper.js');
-const { saveHatchingSignature } = require('../../activities.js');
+const statRandomizer = require('../../api-calculations/nbmonBlockchainStats.js');
+const { getNBMonData } = require('../../api-calculations/nbmonData.js');
+const { getBornAtAlt } = require('../../api-calculations/genesisNBMonHelper.js');
+const { saveHatchingSignature } = require('../activities.js');
 
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, '../../../abi/GenesisNBMon.json'),
+        path.join(__dirname, '../../abi/GenesisNBMon.json'),
     ),
 );
+
 const genesisContract = new ethers.Contract(
     process.env.GENESIS_NBMON_TESTING_ADDRESS,
     genesisABI,

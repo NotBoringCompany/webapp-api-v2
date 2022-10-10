@@ -11,10 +11,10 @@ const appId = process.env.MORALIS_APPID;
 const masterKey = process.env.MORALIS_MASTERKEY;
 
 // IMPORTS
-const parseJSON = require('../../../utils/jsonParser').parseJSON;
-const { getAttackEffectiveness, getDefenseEffectiveness } = require('../../../api-calculations/nbmonTypeEffectiveness');
-const { getNBMonData } = require('../../../api-calculations/nbmonData');
-const { getGenesisFertilityDeduction } = require('../../../api-calculations/genesisNBMonHelper');
+const parseJSON = require('../../utils/jsonParser').parseJSON;
+const { getAttackEffectiveness, getDefenseEffectiveness } = require('../../api-calculations/nbmonTypeEffectiveness');
+const { getNBMonData } = require('../../api-calculations/nbmonData');
+const { getGenesisFertilityDeduction } = require('../../api-calculations/genesisNBMonHelper');
 
 // NOTE: The GenesisNBMon contract will only exist in ONE blockchain.
 // This means that there is no need to specify multiple RPC URLs for dynamic interaction.
@@ -25,9 +25,10 @@ const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, '../../../abi/GenesisNBMon.json'),
+        path.join(__dirname, '../../abi/GenesisNBMon.json'),
     ),
 );
+
 const genesisContract = new ethers.Contract(
     process.env.GENESIS_NBMON_TESTING_ADDRESS,
     genesisABI,
