@@ -13,12 +13,15 @@
 - check if each address can mint 5 NBMons or more. If more or less than 5, change `config` to include the new rule.
 - check if each whitelisted address can mint more than 1 NBMon. if yes, change `canMintWhitelisted` to include the new rule.
 - if a user wants to transfer ownership of an nft, we need the frontend to call `safeTransferFrom` before calling `changeOwnership`.
+- later on: since our code only supports evm chains, we need to include non-evm chains later on.
 
 - IMPORTANT: change ALL genesis testing contract instances (e.g. process.env.GENESIS_NBMON_TESTING_ADDRESS) to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
-and in `getGenesisNBMonOwner` etc where querying in Moralis is needed.
+and in `getGenesisNBMonOwner` where querying in Moralis is needed, also on other files.
 - IMPORTANT: Gaming Backend Repo needs to be changed with the changes in the new moralis db.
 - IMPORTANT: security implementation for `uploadGenesisEggMetadata` as now anyone can just call and upload it.
 - IMPORTANT: security implementation for ALL new moralis classes in new DB. they are still publicly open for read and write.
+- IMPORTANT: security implementation for `ItemsOnSale` class + `listItem` API.
+- IMPORTANT: check with sean or just in general if we want to include nbmon specific data for `getItemsOnSale` just like on V1 API.
 
 
 IMPORTANT CHANGES FROM V1 BACKEND:
@@ -53,3 +56,10 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 28. `canMintUserWhitelisted` is now `canMintWhitelisted`.
 29. `changeGenesisNBMonOwnership` is now `changeOwnership`. It also calls `safeTransferFrom` from the contract as well now.
 30. `addMonthlyTradingVolume` now accepts `address` instead of `ethAddress` as a param.
+31. `changeIsListedStatus` now accepts an `nftContract` parameter to accept all NFTs, not just Genesis NBMons. It also has `tokenId` instead of `id` as a parameter to be more clear.
+32. `deleteItemOnSale` now accepts an `nftContract` parameter to accept all NFTs.
+33. the query for `getListingData` now uses moment().unix() instead of Date.now(). This means that the `startingDate` and `endingDate` for `listItem` needs to use unix instead of Date.now().
+34. `getListingData` now accepts `nftContract` as a parameter to accept all NFTs.
+35. `getItemsOnSale` now will return ALL NFTs that are on sale. this means that we can't only return it specifically as an nbmon object just like the V1 API, so the return values will be default.
+36. `getListingData` now returns error if the item is not found. before this, we only check if there is an item that is not expired using the `greaterThan` query.
+37. `changeOwnerAndChangeListingStatus` is now shortened to `changeOwnerAndListingStatus`. It also now accepts an `nftContract` parameter.
