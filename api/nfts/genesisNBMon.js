@@ -445,6 +445,28 @@ const getOwnedGenesisNBMons = async (address) => {
 };
 
 /**
+ * `getOwnedGenesisNBMonsAlt` is an alternative to `getOwnedGenesisNBMons` which utilizes `getGenesisNBMonAlt` to retrieve the NBMons instead.
+ * @param {String} address the address of the owner to query.
+ * @return {Array} an array of Genesis NBMons owned by `address`.
+ */
+const getOwnedGenesisNBMonsAlt = async (address) => {
+    try {
+        const ownedIDs = await getOwnedGenesisNBMonIDs(address);
+
+        const nbmons = [];
+
+        ownedIDs.forEach(async (id) => {
+            const nbmon = await getGenesisNBMonAlt(id);
+            nbmons.push(nbmon);
+        });
+
+        return nbmons;
+    } catch (err) {
+        throw err;
+    }
+}
+
+/**
  * `getOwnedGenesisNBMonIDs` returns all the Genesis NBMon IDs owned by `address`.
  * @param {String} address the address of the owner to query.
  * @return {Array} an array of Genesis NBMon IDs owned by `address`.
@@ -620,6 +642,7 @@ module.exports = {
     getGenesisNBMonAlt,
     getGenesisNBMonOwner,
     getOwnedGenesisNBMons,
+    getOwnedGenesisNBMonsAlt,
     getOwnedGenesisNBMonIDs,
     generalConfig,
     config,
