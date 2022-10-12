@@ -6,10 +6,6 @@ const path = require('path');
 const moment = require('moment');
 const Moralis = require('moralis-v1/node');
 
-const serverUrl = process.env.MORALIS_SERVERURL;
-const appId = process.env.MORALIS_APPID;
-const masterKey = process.env.MORALIS_MASTERKEY;
-
 // IMPORTS
 const parseJSON = require('../../utils/jsonParser').parseJSON;
 const { getAttackEffectiveness, getDefenseEffectiveness } = require('../../api-calculations/nbmonTypeEffectiveness');
@@ -36,19 +32,21 @@ const genesisContract = new ethers.Contract(
     rpcProvider,
 );
 
-// FUNCTIONS
 /**
  * `getGenesisNBMon` returns a Genesis NBMon object with all relevant blockchain and non-blockchain data.
+ *
+ * stringMetadata[] = gender, rarity, mutation, species, genus, first type, second type, first passive and second passive (9 indexes)
+ *
+ * numericMetadata[] = hatchingDuration, health potential, energy potential, attack potential, defense potential, spAtk potential,
+ * spDef potential, speed potential, fertility points and hatchedAt (10 indexes)
+ *
+ * boolMetadata[] = isEgg (1 index)
+ *
  * @param {Number} id the ID of the Genesis NBMon to query.
  * @return {Object} a GenesisNBMon object.
  */
 const getGenesisNBMon = async (id) => {
     try {
-        await Moralis.start({
-            serverUrl,
-            appId,
-            masterKey,
-        });
         const GenesisNBMon = new Moralis.Query('MintedNFTs');
         // we set the query to match the contract address of the Genesis NBMon contract and the specified ID.
         GenesisNBMon.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
@@ -160,19 +158,20 @@ const getGenesisNBMon = async (id) => {
         nbmonData['isEgg'] = nbmon['boolMetadata'][0] === undefined ? false : nbmon['boolMetadata'][0];
         nbmonData['isListed'] = nbmon['isListed'] === undefined ? false : nbmon['isListed'];
 
+        // we check if the nbmon is listed on sale in the marketplace.
         if (nbmon.isListed) {
             const listingData = await getListingData(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
 
             // if listing data is null, this means that the listing is expired.
             // we will set `isListed` to be false and then change its status and delete this item from `ItemsOnSale`.
             if (listingData === null) {
-                nbmon['isListed'] = false;
+                nbmonData['isListed'] = false;
 
                 await changeIsListedStatus(false, process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
                 await deleteItemOnSale(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
             }
 
-            nbmonObj = { ...nbmonObj, listingData };
+            nbmonData = { ...nbmonData, listingData };
         } else {
             nbmonData['listingData'] = null;
         }
@@ -189,6 +188,163 @@ const getGenesisNBMon = async (id) => {
         nbmonData['spAtkEffort'] = nbmonGameData['spAtkEffort'] === undefined ? null : nbmonGameData['spAtkEffort'];
         nbmonData['defenseEffort'] = nbmonGameData['defenseEffort'] === undefined ? null : nbmonGameData['defenseEffort'];
         nbmonData['spDefEffort'] = nbmonGameData['spDefEffort'] === undefined ? null : nbmonGameData['spDefEffort'];
+
+        return nbmonData;
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
+ * `getGenesisNBMonAlt` is an alternative to `getGenesisNBMon` where certain data are returned in different format.
+ * This function will primarily be used for our backend Playfab API which uses C#.
+ * C# is static type, meaning that the return values will have to default to -1, '' or 0 instead of `null`, otherwise there will be formatting errors.
+ * @param {Number} id the NFT ID
+ * @return {Object} a GenesisNBMon object
+ */
+const getGenesisNBMonAlt = async (id) => {
+    try {
+        const GenesisNBMon = new Moralis.Query('MintedNFTs');
+        // we set the query to match the contract address of the Genesis NBMon contract and the specified ID.
+        GenesisNBMon.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        const querySearch = GenesisNBMon.equalTo('tokenId', id);
+
+        const query = await querySearch.first({ useMasterKey: true });
+
+        // if the query result doesn't return anything, we throw an error.
+        if (query === undefined || query === null || query === '' || query.length === 0) {
+            throw new Error(`No Genesis NBMon found with the specified ID ${id}`);
+        }
+
+
+        // we parse the query to return a readable object.
+        const nbmon = parseJSON(query);
+
+        // we query the nbmon instance in another class called `nbmonGameData` to retrieve the nbmon's game data
+        const GameData = new Moralis.Query('nbmonGameData');
+        GameData.matchesQuery('nbmonInstance', querySearch);
+
+        const gameDataQuery = await GameData.first({ useMasterKey: true });
+        // we parse the nbmon game data query to return a readable object.
+        const nbmonGameData = parseJSON(gameDataQuery);
+
+        // we initialize an empty object to store all the Genesis NBMon data.
+        const nbmonData = {};
+
+        nbmonData['nbmonId'] = nbmon['tokenId'];
+        nbmonData['owner'] = nbmon['owner'];
+        nbmonData['bornAt'] = nbmon['bornAt'];
+
+        // calculates if the nbmon is hatchable
+        const now = moment().unix();
+        const hatchableTime = parseInt(Number(nbmon['numericMetadata'][0])) + parseInt(Number(nbmon['bornAt']));
+
+        // check if isEgg is true or false to return respective hatching metadata
+        if (nbmon['boolMetadata'][0] === true) {
+            nbmonData['hatchedAt'] = -1;
+            nbmonData['isHatchable'] = now >= hatchableTime;
+        } else {
+            nbmonData['hatchedAt'] = nbmon['numericMetadata'][9];
+            nbmonData['isHatchable'] = false;
+        }
+
+        nbmonData['transferredAt'] = nbmon['transferredAt'];
+        nbmonData['hatchingDuration'] = nbmon['numericMetadata'][0];
+
+        // the types of the nbmon. will most likely be undefined if the nbmon is an egg.
+        const firstType = nbmon['stringMetadata'][5] === undefined ? '' : nbmon['stringMetadata'][5];
+        const secondType = nbmon['stringMetadata'][6] === undefined ? '' : nbmon['stringMetadata'][6];
+
+        nbmonData['types'] = [firstType, secondType];
+
+        // calculates type effectiveness of the NBMon
+        const attackEff = await getAttackEffectiveness(firstType, secondType);
+        const defenseEff = await getDefenseEffectiveness(firstType, secondType);
+
+        nbmonData['strongAgainst'] = attackEff['Strong against'];
+        nbmonData['weakAgainst'] = attackEff['Weak against'];
+        nbmonData['resistantTo'] = defenseEff['Resistant to'];
+        nbmonData['vulnerableTo'] = defenseEff['Vulnerable to'];
+
+        // obtaining the passives of the NBMon. checks for undefined values as well.
+        const firstPassive = nbmon['stringMetadata'][7] === undefined ? '' : nbmon['stringMetadata'][7];
+        const secondPassive = nbmon['stringMetadata'][8] === undefined ? '' : nbmon['stringMetadata'][8];
+
+        nbmonData['passives'] = [firstPassive, secondPassive];
+        nbmonData['gender'] = nbmon['stringMetadata'][0] === undefined ? '' : nbmon['stringMetadata'][0];
+        nbmonData['rarity'] = nbmon['stringMetadata'][1] === undefined ? '' : nbmon['stringMetadata'][1];
+        nbmonData['species'] = nbmon['stringMetadata'][3] === undefined ? '' : nbmon['stringMetadata'][3];
+        nbmonData['genus'] = nbmon['stringMetadata'][4] === undefined ? '' : nbmon['stringMetadata'][4];
+
+        let nbpediaData;
+
+        if (nbmonData['genus'] === null || '') {
+            nbmonData['genusDescription'] = '';
+        } else {
+            nbpediaData = getNBMonData(nbmonData['genus']);
+        }
+
+        // mutation calculation
+        // checks if nbmon is still an egg
+        if (nbmon['boolMetadata'][0] === true) {
+            nbmonData['mutation'] = 'Not mutated';
+            nbmonData['mutationType'] = '';
+            nbmonData['behavior'] = '';
+        // if it already has hatched
+        } else {
+            nbmonData['mutation'] = nbmon['stringMetadata'][2] === 'Not mutated' ? nbmon['stringMetadata'][2] : 'Mutated';
+            nbmonData['mutationType'] === nbmonData['mutation'] === 'Mutated' ? nbmon['stringMetadata'][2] : '';
+            nbmonData['behavior'] = nbpediaData['behavior'] === undefined ? '' : nbpediaData['behavior'];
+        }
+
+        nbmonData['fertility'] = nbmon['numericMetadata'][8] === undefined ? -1 : nbmon['numericMetadata'][8];
+
+        if (nbmonData['rarity'] !== null) {
+            nbmonData['fertilityDeduction'] = getGenesisFertilityDeduction(nbmonData['rarity']);
+        } else {
+            nbmonData['fertilityDeduction'] = -1;
+        }
+
+        nbmonData['healthPotential'] = nbmon['numericMetadata'][1] === undefined ? -1 : nbmon['numericMetadata'][1];
+        nbmonData['energyPotential'] = nbmon['numericMetadata'][2] === undefined ? -1 : nbmon['numericMetadata'][2];
+        nbmonData['attackPotential'] = nbmon['numericMetadata'][3] === undefined ? -1 : nbmon['numericMetadata'][3];
+        nbmonData['defensePotential'] = nbmon['numericMetadata'][4] === undefined ? -1 : nbmon['numericMetadata'][4];
+        nbmonData['spAtkPotential'] = nbmon['numericMetadata'][5] === undefined ? -1 : nbmon['numericMetadata'][5];
+        nbmonData['spDefPotential'] = nbmon['numericMetadata'][6] === undefined ? -1 : nbmon['numericMetadata'][6];
+        nbmonData['speedPotential'] = nbmon['numericMetadata'][7] === undefined ? -1 : nbmon['numericMetadata'][7];
+        nbmonData['isEgg'] = nbmon['boolMetadata'][0] === undefined ? false : nbmon['boolMetadata'][0];
+        nbmonData['isListed'] = nbmon['isListed'] === undefined ? false : nbmon['isListed'];
+
+        // we check if the nbmon is listed on sale in the marketplace.
+        if (nbmon.isListed) {
+            const listingData = await getListingData(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+
+            // if listing data is null, this means that the listing is expired.
+            // we will set `isListed` to be false and then change its status and delete this item from `ItemsOnSale`.
+            if (listingData === null) {
+                nbmonData['isListed'] = false;
+
+                await changeIsListedStatus(false, process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+                await deleteItemOnSale(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+            }
+
+            nbmonData = { ...nbmonData, listingData };
+        } else {
+            nbmonData['listingData'] = [];
+        }
+
+        // nbmon game data manipulation
+        nbmonData['currentExp'] = nbmonGameData['currentExp'] === undefined ? -1 : nbmonGameData['currentExp'];
+        nbmonData['level'] = nbmonGameData['level'] === undefined ? -1 : nbmonGameData['level'];
+        nbmonData['nickname'] = nbmonGameData['nickname'] === undefined ? '' : nbmonGameData['nickname'];
+        nbmonData['skillList'] = nbmonGameData['skillList'] === undefined ? [] : nbmonGameData['skillList'];
+        nbmonData['maxHpEffort'] = nbmonGameData['maxHpEffort'] === undefined ? -1 : nbmonGameData['maxHpEffort'];
+        nbmonData['maxEnergyEffort'] = nbmonGameData['maxEnergyEffort'] === undefined ? -1 : nbmonGameData['maxEnergyEffort'];
+        nbmonData['speedEffort'] = nbmonGameData['speedEffort'] === undefined ? -1 : nbmonGameData['speedEffort'];
+        nbmonData['attackEffort'] = nbmonGameData['attackEffort'] === undefined ? -1 : nbmonGameData['attackEffort'];
+        nbmonData['spAtkEffort'] = nbmonGameData['spAtkEffort'] === undefined ? -1 : nbmonGameData['spAtkEffort'];
+        nbmonData['defenseEffort'] = nbmonGameData['defenseEffort'] === undefined ? -1 : nbmonGameData['defenseEffort'];
+        nbmonData['spDefEffort'] = nbmonGameData['spDefEffort'] === undefined ? -1 : nbmonGameData['spDefEffort'];
 
         return nbmonData;
     } catch (err) {
@@ -461,6 +617,7 @@ const canMintWhitelisted = (isPublicOpen, isWhitelistOpen, amountMinted, hasMint
 
 module.exports = {
     getGenesisNBMon,
+    getGenesisNBMonAlt,
     getGenesisNBMonOwner,
     getOwnedGenesisNBMons,
     getOwnedGenesisNBMonIDs,

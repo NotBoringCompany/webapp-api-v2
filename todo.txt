@@ -1,3 +1,4 @@
+- talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
 - make the alt versions of the genesisNBMon functions for Playfab obtaining.
 - Create addToActivities, import to genesisNBMonMinting API
 - Create uploadGenesisEggMetadata, import to genesisNBMonMinting API
