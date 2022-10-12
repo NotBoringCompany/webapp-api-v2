@@ -225,7 +225,7 @@ const changeOwnership = async (nbmonId, toAddress) => {
 
         // now, we set the owner to the new `toAddress` and save it.
         result.set('owner', toAddress);
-        result.save(null, { useMasterKey: true });
+        await result.save(null, { useMasterKey: true });
 
         return {
             status: 'OK',

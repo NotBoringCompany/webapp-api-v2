@@ -3,6 +3,7 @@ require('dotenv').config();
 const crypto = require('crypto');
 const Moralis = require('moralis-v1/node');
 const moment = require('moment');
+const axios = require('axios').default;
 
 // IMPORTS
 const { parseJSON } = require('../../utils/jsonParser');
@@ -97,7 +98,7 @@ const changeIsListedStatus = async (status, nftContract, tokenId) => {
 
         result.set('isListed', status);
 
-        result.save(null, { useMasterKey: true });
+        await result.save(null, { useMasterKey: true });
 
         return {
             status: 'OK',
@@ -250,11 +251,80 @@ const changeOwnerAndListingStatus = async (nftContract, tokenId, purchaserAddres
         result.set('isListed', false);
         result.set('owner', purchaserAddress);
 
-        result.save(null, { useMasterKey: true });
+        await result.save(null, { useMasterKey: true });
 
         return {
             status: 'OK',
         };
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
+ * `calculateUsdPrice` calculates the USD price of an item based on the price of the item in their respective currencies.
+ * This is used since we are going to accommodate more than 1 acceptable payment token (e.g. BUSD, WETH, AVAX, CRO etc).
+ * @param {String} nftContract the address of the item's NFT contract
+ * @param {Number} tokenId the NFT ID
+ * @return {Number} the USD price of the item.
+ */
+const calculateUsdPrice = async (nftContract, tokenId) => {
+    try {
+        const ItemsOnSale = new Moralis.Query('ItemsOnSale');
+        ItemsOnSale.equalTo('nftContract', nftContract);
+        ItemsOnSale.equalTo('tokenId', tokenId);
+
+        const result = await ItemsOnSale.first({ useMasterKey: true });
+
+        if (result === undefined) {
+            throw new Error('Cannot find specific item. Please ensure that the parameters are correct.');
+        }
+
+        // we get the payment token name and the amount of tokens the item costs
+        const paymentToken = (parseJSON(result)).paymentToken;
+        const tokenAmount = (parseJSON(result)).price;
+
+        let coinId;
+        let coinPrice;
+
+        // Note: we will use CoinGecko to retrieve the price of the token.
+        // there is a chance that for newer tokens (such as our REC and RES) the price won't be available on CoinGecko yet.
+        // though we will apply for them to be listed on CoinGecko soon, it won't be available immediately.
+        // in this case, we will specifically hardcode the price search ourselves.
+        // if the token isn't found, however, it will return an error.
+        if (paymentToken.toLowerCase().includes('rec') || paymentToken.toLowerCase().includes('realm coin')) {
+            // assuming we are launching REC in PancakeSwap
+            console.log('To do: PancakeSwap API call');
+        } else if (paymentToken.toLowerCase().includes('res') || paymentToken.toLowerCase().includes('realm shards')) {
+            // assuming we are launching REs in PancakeSwap
+            console.log('To do: PancakeSwap API call');
+        } else {
+            await axios
+                .get(`https://api.coingecko.com/api/v3/coins/list`)
+                .then((response) => {
+                    const data = response.data;
+                    for (let i = 0; i < data.length; i++) {
+                        const coin = data[i];
+                        // some tokens have multiple results. in this case, we only want the first result and hope that it is the correct one.
+                        if (coin.symbol === paymentToken.toLowerCase()) {
+                            coinId = coin.id;
+                            break;
+                        }
+                    }
+                });
+
+            await axios
+                .get(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`)
+                .then((response) => {
+                    coinPrice = response.data[coinId].usd;
+                });
+
+            if (coinPrice === undefined || coinPrice === null || coinPrice === 0) {
+                throw new Error('Cannot determine price of token. Please try again later');
+            }
+        }
+
+        return tokenAmount * coinPrice;
     } catch (err) {
         throw err;
     }
@@ -268,4 +338,5 @@ module.exports = {
     getListingData,
     changeOwnerAndListingStatus,
     changeIsListedStatus,
+    calculateUsdPrice,
 };

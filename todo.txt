@@ -14,6 +14,7 @@
 - check if each whitelisted address can mint more than 1 NBMon. if yes, change `canMintWhitelisted` to include the new rule.
 - if a user wants to transfer ownership of an nft, we need the frontend to call `safeTransferFrom` before calling `changeOwnership`.
 - later on: since our code only supports evm chains, we need to include non-evm chains later on.
+- Use scheduler to call `resetMonthlyTradingVolume`.
 
 - IMPORTANT: change ALL genesis testing contract instances (e.g. process.env.GENESIS_NBMON_TESTING_ADDRESS) to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
 and in `getGenesisNBMonOwner` where querying in Moralis is needed, also on other files.
@@ -22,6 +23,7 @@ and in `getGenesisNBMonOwner` where querying in Moralis is needed, also on other
 - IMPORTANT: security implementation for ALL new moralis classes in new DB. they are still publicly open for read and write.
 - IMPORTANT: security implementation for `ItemsOnSale` class + `listItem` API.
 - IMPORTANT: check with sean or just in general if we want to include nbmon specific data for `getItemsOnSale` just like on V1 API.
+- IMPORTANT: Security implementation for all marketplace related functions (web app tier + in game tier specifically)
 
 
 IMPORTANT CHANGES FROM V1 BACKEND:
@@ -63,3 +65,5 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 35. `getItemsOnSale` now will return ALL NFTs that are on sale. this means that we can't only return it specifically as an nbmon object just like the V1 API, so the return values will be default.
 36. `getListingData` now returns error if the item is not found. before this, we only check if there is an item that is not expired using the `greaterThan` query.
 37. `changeOwnerAndChangeListingStatus` is now shortened to `changeOwnerAndListingStatus`. It also now accepts an `nftContract` parameter.
+38. `UserWebAppData` and `UserInGameData` in Moralis is now `WebAppData` and `RealmHunterData`.
+39. `calculateUsdPrice` now has multiple price oracle options. NOTE: strict payment token naming procedure NEEDS TO TAKE PLACE! (BE AWARE OF THIS. this means that paymentTokenName must be following at least CoinGecko names.)
