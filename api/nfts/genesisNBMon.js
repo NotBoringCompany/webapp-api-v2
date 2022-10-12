@@ -15,6 +15,7 @@ const parseJSON = require('../../utils/jsonParser').parseJSON;
 const { getAttackEffectiveness, getDefenseEffectiveness } = require('../../api-calculations/nbmonTypeEffectiveness');
 const { getNBMonData } = require('../../api-calculations/nbmonData');
 const { getGenesisFertilityDeduction } = require('../../api-calculations/genesisNBMonHelper');
+const { getListingData, changeIsListedStatus, deleteItemOnSale } = require('../webapp/marketplace');
 
 // NOTE: The GenesisNBMon contract will only exist in ONE blockchain.
 // This means that there is no need to specify multiple RPC URLs for dynamic interaction.
@@ -160,19 +161,18 @@ const getGenesisNBMon = async (id) => {
         nbmonData['isListed'] = nbmon['isListed'] === undefined ? false : nbmon['isListed'];
 
         if (nbmon.isListed) {
-            /* eslint-disable */
-            // ////////////////// GET LISTING DATA FUNCTION HERE////////////////////
-            // /If !listingData (listingData === null) -> listing is expired
-			// if (!listingData) {
-			// 	nbmonObj["isListed"] = false;
+            const listingData = await getListingData(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
 
-			// 	// Changes the isListed to be false
-			// 	await changeIsListedStatus(false, id);
-			// 	await deleteItemOnSale(id);
-			// }
-			// nbmonObj = { ...nbmonObj, listingData };
-            // /////////////////////////////////////////////////////////////////////
-            /* eslint-enable */
+            // if listing data is null, this means that the listing is expired.
+            // we will set `isListed` to be false and then change its status and delete this item from `ItemsOnSale`.
+            if (listingData === null) {
+                nbmon['isListed'] = false;
+
+                await changeIsListedStatus(false, process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+                await deleteItemOnSale(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+            }
+
+            nbmonObj = { ...nbmonObj, listingData };
         } else {
             nbmonData['listingData'] = null;
         }
