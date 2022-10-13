@@ -112,9 +112,8 @@ const publicMint = async (toAddress) => {
         uploadGenesisEggMetadata(mintedId);
 
         const jsonTx = parseJSON(signedTx);
-        const network = (await rpcProvider.getNetwork()).name;
 
-        await addToActivities(jsonTx.hash, 'genesisMinting', network, process.env.MINTING_PRICE);
+        await addToActivities(jsonTx.hash, 'genesisMinting', blockchain, process.env.MINTING_PRICE);
 
         return { nbmonId: mintedId };
     } catch (err) {
@@ -201,9 +200,8 @@ const whitelistedMint = async (toAddress) => {
         uploadGenesisEggMetadata(mintedId);
 
         const jsonTx = parseJSON(signedTx);
-        const network = await rpcProvider.getNetwork();
 
-        await addToActivities(jsonTx.hash, 'genesisMinting', network, process.env.MINTING_PRICE);
+        await addToActivities(jsonTx.hash, 'genesisMinting', blockchain, process.env.MINTING_PRICE);
 
         return { nbmonId: mintedId };
     } catch (err) {
