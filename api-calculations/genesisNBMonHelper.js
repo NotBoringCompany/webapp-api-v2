@@ -5,7 +5,7 @@ const fs = require('fs');
 const Moralis = require('moralis-v1/node');
 const path = require('path');
 
-const rpcUrl = process.env.CRONOS_RPC_URL;
+const rpcUrl = process.env.BSC_RPC_URL;
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
 // Genesis NBMon contract-related variables
@@ -15,7 +15,7 @@ const genesisABI = JSON.parse(
     ),
 );
 const genesisContract = new ethers.Contract(
-    process.env.GENESIS_NBMON_TESTING_ADDRESS,
+    process.env.GENESIS_NBMON_ADDRESS,
     genesisABI,
     rpcProvider,
 );

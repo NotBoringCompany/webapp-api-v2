@@ -5,29 +5,30 @@ const ethers = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
+
+// IMPORTS
 const { uploadGenesisEggMetadata } = require('./nbmonMetadata');
-// TO DO: create addToActivities + uploadGenesisEggMetadata and import here
+const { addToActivities } = require('../webapp/activities');
+const { parseJSON } = require('../../utils/jsonParser');
 
 const privateKey = process.env.TEST_ADMIN_PRIVATE_KEY;
 const hatchingDuration = process.env.HATCHING_DURATION;
 
-const rpcUrl = process.env.CRONOS_RPC_URL;
+const rpcUrl = process.env.BSC_RPC_URL;
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, '../../abi/GenesisNBMon.json'),
+        path.join(__dirname, '../../abi/genesisNBMon.json'),
     ),
 );
 
 const genesisContract = new ethers.Contract(
-    process.env.GENESIS_NBMON_TESTING_ADDRESS,
+    process.env.GENESIS_NBMON_ADDRESS,
     genesisABI,
     rpcProvider,
 );
-
-// FUNCTIONS
 
 /**
  * `publicMint` mints a Genesis NBMon egg (public minting method).
@@ -38,6 +39,14 @@ const genesisContract = new ethers.Contract(
  */
 const publicMint = async (toAddress) => {
     try {
+        const serverUrl = process.env.MORALIS_SERVERURL;
+        const appId = process.env.MORALIS_APPID;
+        const masterKey = process.env.MORALIS_MASTERKEY;
+        await Moralis.start({
+            serverUrl,
+            appId,
+            masterKey,
+        });
         const signer = new ethers.Wallet(privateKey, rpcProvider);
 
         // NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
@@ -45,7 +54,7 @@ const publicMint = async (toAddress) => {
         const stringMetadata = ['', '', '', '', '', '', '', '', ''];
 
         // current hatching duration for testing is temporary. This will be changed to the appropriate number for production.
-        const numericMetadata = [hatchingDuration, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        const numericMetadata = [parseInt(hatchingDuration), 0, 0, 0, 0, 0, 0, 0, 0, 0];
         const boolMetadata = [true];
 
         const unsignedTx = await genesisContract.populateTransaction.publicMint(
@@ -60,8 +69,6 @@ const publicMint = async (toAddress) => {
         // waits for the transaction to be signed and mined.
         await signedTx.wait();
 
-        console.log(signedTx);
-
         // upon successful minting, the _currentIndex of the GenesisNBMons contract should be incremented by 1.
         // _currentIndex refers to the next NBMon ID to be minted (essentially totalSupply + 1).
         // so here, the mintedId will be the supposed actual ID that was minted.
@@ -71,6 +78,9 @@ const publicMint = async (toAddress) => {
         // Moralis saving-related variables
         const MintedNFTs = Moralis.Object.extend('MintedNFTs');
         const mintedNFTs = new MintedNFTs();
+
+        const GameData = Moralis.Object.extend('nbmonGameData');
+        const gameData = new GameData();
 
         mintedNFTs.set('nftName', 'genesisNbmon');
         mintedNFTs.set('contractAddress', genesisContract.address);
@@ -101,10 +111,10 @@ const publicMint = async (toAddress) => {
         // we upload the newly minted NBMon egg's metadata to DigitalOcean Spaces.
         uploadGenesisEggMetadata(mintedId);
 
-        /* eslint-disable */
-        ///////////////////// TO DO: ADDTOACTIVITIES////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////
-        /* eslint-enable */
+        const jsonTx = parseJSON(signedTx);
+        const network = (await rpcProvider.getNetwork()).name;
+
+        await addToActivities(jsonTx.hash, 'genesisMinting', network, process.env.MINTING_PRICE);
 
         return { nbmonId: mintedId };
     } catch (err) {
@@ -128,7 +138,7 @@ const whitelistedMint = async (toAddress) => {
         const stringMetadata = ['', '', '', '', '', '', '', '', ''];
 
         // current hatching duration for testing is temporary. This will be changed to the appropriate number for production.
-        const numericMetadata = [hatchingDuration, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        const numericMetadata = [parseInt(hatchingDuration), 0, 0, 0, 0, 0, 0, 0, 0, 0];
         const boolMetadata = [true];
 
         const unsignedTx = await genesisContract.populateTransaction.whitelistedMint(
@@ -142,8 +152,6 @@ const whitelistedMint = async (toAddress) => {
         const signedTx = await signer.sendTransaction(unsignedTx);
         // waits for the transaction to be signed and mined.
         await signedTx.wait();
-
-        console.log(signedTx);
 
         // upon successful minting, the _currentIndex of the GenesisNBMons contract should be incremented by 1.
         // _currentIndex refers to the next NBMon ID to be minted (essentially totalSupply + 1).
@@ -192,10 +200,10 @@ const whitelistedMint = async (toAddress) => {
         // we upload the newly minted NBMon egg's metadata to DigitalOcean Spaces.
         uploadGenesisEggMetadata(mintedId);
 
-        /* eslint-disable */
-        ///////////////////// TO DO: ADDTOACTIVITIES////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////
-        /* eslint-enable */
+        const jsonTx = parseJSON(signedTx);
+        const network = await rpcProvider.getNetwork();
+
+        await addToActivities(jsonTx.hash, 'genesisMinting', network, process.env.MINTING_PRICE);
 
         return { nbmonId: mintedId };
     } catch (err) {

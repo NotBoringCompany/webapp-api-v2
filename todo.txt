@@ -1,5 +1,5 @@
 - talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
-- make the alt versions of the genesisNBMon functions for Playfab obtaining.
+- convert `network` string to `blockchain` object foppr `addToActivities` and everything else since a lot of them have no names. this means that we have to manually add it ourselves.
 - Create addToActivities, import to genesisNBMonMinting API
 - Create uploadGenesisEggMetadata, import to genesisNBMonMinting API
 - declare uploadGenesisEggMetadata and addToActivities in `publicMint`
@@ -67,3 +67,6 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 37. `changeOwnerAndChangeListingStatus` is now shortened to `changeOwnerAndListingStatus`. It also now accepts an `nftContract` parameter.
 38. `UserWebAppData` and `UserInGameData` in Moralis is now `WebAppData` and `RealmHunterData`.
 39. `calculateUsdPrice` now has multiple price oracle options. NOTE: strict payment token naming procedure NEEDS TO TAKE PLACE! (BE AWARE OF THIS. this means that paymentTokenName must be following at least CoinGecko names.)
+40. `getOwnerGenesisNBMonsAlt` is now `getOwnedGenesisNBMonsAlt`.
+41. changed `network` in `UserActivities` to `blockchain`. this is because some networks like cronos testnet cannot be detected by Moralis, and the name is 'unknown'.
+this is why it's better to save the blockchain object with its chain ID + name just in case one of them doesn't show.

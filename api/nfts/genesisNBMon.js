@@ -15,8 +15,8 @@ const { getListingData, changeIsListedStatus, deleteItemOnSale } = require('../w
 
 // NOTE: The GenesisNBMon contract will only exist in ONE blockchain.
 // This means that there is no need to specify multiple RPC URLs for dynamic interaction.
-// Currently, this RPC URL is set to Cronos Testnet for testing purposes, but it will most likely be on Ethereum.
-const rpcUrl = process.env.CRONOS_RPC_URL;
+// Currently, this RPC URL is set to BSC Testnet for testing purposes, but it will most likely be on Ethereum.
+const rpcUrl = process.env.BSC_RPC_URL;
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
 // Genesis NBMon contract-related variables
@@ -27,7 +27,7 @@ const genesisABI = JSON.parse(
 );
 
 const genesisContract = new ethers.Contract(
-    process.env.GENESIS_NBMON_TESTING_ADDRESS,
+    process.env.GENESIS_NBMON_ADDRESS,
     genesisABI,
     rpcProvider,
 );
@@ -49,7 +49,7 @@ const getGenesisNBMon = async (id) => {
     try {
         const GenesisNBMon = new Moralis.Query('MintedNFTs');
         // we set the query to match the contract address of the Genesis NBMon contract and the specified ID.
-        GenesisNBMon.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        GenesisNBMon.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
         const querySearch = GenesisNBMon.equalTo('tokenId', id);
 
         const query = await querySearch.first({ useMasterKey: true });
@@ -160,15 +160,15 @@ const getGenesisNBMon = async (id) => {
 
         // we check if the nbmon is listed on sale in the marketplace.
         if (nbmon.isListed) {
-            const listingData = await getListingData(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+            const listingData = await getListingData(process.env.GENESIS_NBMON_ADDRESS, id);
 
             // if listing data is null, this means that the listing is expired.
             // we will set `isListed` to be false and then change its status and delete this item from `ItemsOnSale`.
             if (listingData === null) {
                 nbmonData['isListed'] = false;
 
-                await changeIsListedStatus(false, process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
-                await deleteItemOnSale(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+                await changeIsListedStatus(false, process.env.GENESIS_NBMON_ADDRESS, id);
+                await deleteItemOnSale(process.env.GENESIS_NBMON_ADDRESS, id);
             }
 
             nbmonData = { ...nbmonData, listingData };
@@ -206,7 +206,7 @@ const getGenesisNBMonAlt = async (id) => {
     try {
         const GenesisNBMon = new Moralis.Query('MintedNFTs');
         // we set the query to match the contract address of the Genesis NBMon contract and the specified ID.
-        GenesisNBMon.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        GenesisNBMon.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
         const querySearch = GenesisNBMon.equalTo('tokenId', id);
 
         const query = await querySearch.first({ useMasterKey: true });
@@ -317,15 +317,15 @@ const getGenesisNBMonAlt = async (id) => {
 
         // we check if the nbmon is listed on sale in the marketplace.
         if (nbmon.isListed) {
-            const listingData = await getListingData(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+            const listingData = await getListingData(process.env.GENESIS_NBMON_ADDRESS, id);
 
             // if listing data is null, this means that the listing is expired.
             // we will set `isListed` to be false and then change its status and delete this item from `ItemsOnSale`.
             if (listingData === null) {
                 nbmonData['isListed'] = false;
 
-                await changeIsListedStatus(false, process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
-                await deleteItemOnSale(process.env.GENESIS_NBMON_TESTING_ADDRESS, id);
+                await changeIsListedStatus(false, process.env.GENESIS_NBMON_ADDRESS, id);
+                await deleteItemOnSale(process.env.GENESIS_NBMON_ADDRESS, id);
             }
 
             nbmonData = { ...nbmonData, listingData };
@@ -370,7 +370,7 @@ const changeOwnership = async (nbmonId, toAddress) => {
         // we query the MintedNFTs class in Moralis
         const MintedNFTs = new Moralis.Query('MintedNFTs');
         // we ensure that the query is set to the Genesis NBMon contract and the respective NBMon ID
-        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
         MintedNFTs.equalTo('tokenId', nbmonId);
 
         const result = await MintedNFTs.first({ useMasterKey: true });
@@ -406,7 +406,7 @@ const getGenesisNBMonOwner = async (id) => {
 
         const MintedNFTs = new Moralis.Query('MintedNFTs');
         // first we ensure that we are querying for the Genesis NBMons.
-        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
         MintedNFTs.equalTo('tokenId', id);
 
         const genesisNBMon = await MintedNFTs.first({ useMasterKey: true });
@@ -464,7 +464,7 @@ const getOwnedGenesisNBMonsAlt = async (address) => {
     } catch (err) {
         throw err;
     }
-}
+};
 
 /**
  * `getOwnedGenesisNBMonIDs` returns all the Genesis NBMon IDs owned by `address`.

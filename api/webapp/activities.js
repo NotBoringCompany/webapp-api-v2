@@ -6,7 +6,7 @@ require('dotenv').config();
 // Ethereum Decoder to try and match the hash obtained from the
 // blockchain data hashes, such as in `checkHatchingSignatureValid`.
 const InputDataDecoder = require('ethereum-input-data-decoder');
-const genesisABI = require(`${__dirname}/../abi/GenesisNBMon.json`);
+const genesisABI = require(`${__dirname}/../../abi/genesisNBMon.json`);
 
 const decoder = new InputDataDecoder(genesisABI);
 
@@ -163,7 +163,7 @@ const invalidateHatchingSignature = async (signature) => {
  * 
  * @param {String} txHash the blockchain transaction hash of the activity (e.g. minting/hatching a Genesis NBMon)
  * @param {String} txType the type of activity (e.g. Genesis NBMon minting/hatching)
- * @param {String} network the blockchain network the activity happened on (e.g. Ethereum Mainnet, abbreviated to 'eth')
+ * @param {String} network the blockchain network the activity happened on (e.g. Ethereum Mainnet, abbreviated to 'eth').
  * @param {Number} txValue the transaction value (if any, otherwise 0, example when transferring someone some ETH)
  * @return {Object} an object that shows 'OK' if the activity is successfully added and no errors are thrown.
  */
@@ -190,7 +190,7 @@ const addToActivities = async (txHash, txType, network, txValue) => {
                 // This will be updated accordingly.
                 NFTTransfers = new Moralis.Query('AvaxNFTTransfers');
             } else {
-                throw new Error('Network not supported. For now, only ETH, MATIC, BSC, CRONOS and AVAX are supported in Moralis.');
+                throw new Error('Network not supported or `unknown`. For now, only ETH, MATIC, BSC, CRONOS and AVAX are supported in Moralis.');
             }
 
             NFTTransfers.equalTo('transaction_hash', txHash);
@@ -219,7 +219,7 @@ const addToActivities = async (txHash, txType, network, txValue) => {
             activities.set('txValue', txValue);
             activities.set('timestamp', block_timestamp);
             activities.set('nftName', 'genesisNbmon');
-            activities.set('nftContractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+            activities.set('nftContractAddress', process.env.GENESIS_NBMON_ADDRESS);
 
             await activities.save(null, { useMasterKey: true });
         // if the tx type is genesis nbmon hatching

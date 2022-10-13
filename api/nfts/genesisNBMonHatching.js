@@ -9,7 +9,7 @@ const crypto = require('crypto');
 const privateKey = process.env.TEST_ADMIN_PRIVATE_KEY;
 
 const minterWallet = new ethers.Wallet(privateKey);
-const rpcUrl = process.env.CRONOS_RPC_URL;
+const rpcUrl = process.env.BSC_RPC_URL;
 const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
 // IMPORTS
@@ -26,7 +26,7 @@ const genesisABI = JSON.parse(
 );
 
 const genesisContract = new ethers.Contract(
-    process.env.GENESIS_NBMON_TESTING_ADDRESS,
+    process.env.GENESIS_NBMON_ADDRESS,
     genesisABI,
     rpcProvider,
 );
@@ -202,7 +202,7 @@ const updateHatchedNBMon = async (nbmonId) => {
 
         const MintedNFTs = new Moralis.Query('MintedNFTs');
         // we ensure that we are querying for Genesis NBMons in the MintedNFTs class.
-        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_TESTING_ADDRESS);
+        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
         MintedNFTs.equalTo('tokenId', nbmonId);
 
         const genesisNBMon = await MintedNFTs.first({ useMasterKey: true });

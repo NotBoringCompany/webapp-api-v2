@@ -49,7 +49,7 @@ const listItem = async (
         // checks if the nft contract address is equivalent to the Genesis NBMon contract. The marketplace only supports Genesis NBMons for now.
         // this is to prevent random nft sales to be added to Moralis.
         // NOTE: Please change the env to ACTUAL_ADDRESS once testing is complete.
-        if (nftContract.toLowerCase() !== process.env.GENESIS_NBMON_TESTING_ADDRESS.toLowerCase()) {
+        if (nftContract.toLowerCase() !== process.env.GENESIS_NBMON_ADDRESS.toLowerCase()) {
             throw new Error('Specified NFT contract is NOT Genesis NBMon. We currently only support Genesis NBMon');
         }
 
