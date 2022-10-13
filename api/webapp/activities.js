@@ -46,28 +46,32 @@ const saveHatchingSignature = async (nftName, signature) => {
  * Valid here means:
  * 1. An egg has been hatched with that signature AND
  * 2. this hatching 'event' hasn't been added to the user's activity list yet.
- * @param {string} network the blockchain network the activity was conducted in.
+ * @param {Object} blockchain the blockchain network the activity happened on (e.g. Ethereum Mainnet, abbreviated to 'eth').
+ * this object contains both the `name` and the `chainId` of the network, since some network names are unrecognized by ethers.
  * @param {String} txHash the transaction hash of the activity.
  * @return {Object} an object that contains `valid`, `data` and `decodedSignature`.
  */
-const checkHatchingSignatureValid = async (network, txHash) => {
+const checkHatchingSignatureValid = async (blockchain, txHash) => {
     try {
         let Transactions;
 
-        // if the network is Ethereum (Mainnet/Testnet)
-        if (network.toLowerCase().contains('eth')) {
+        // if the network is either eth or goerli
+        if (blockchain.chainId === 1 || blockchain.chainId === 5) {
             Transactions = new Moralis.Query('EthTransactions');
-        // if the network is Matic (Mainnet/Testnet)
-        } else if (network.toLowerCase().contains('polygon') || network.toLowerCase().contains('matic')) {
+        // if the network is either matic or mumbai
+        } else if (blockchain.chainId === 137 || blockchain.chainId === 80001) {
             Transactions = new Moralis.Query('PolygonTransactions');
-        // if the network is BSC/BNB Chain (Mainnet/Testnet)
-        } else if (network.toLowerCase().contains('bsc')) {
+        // if the network is either bnb smart chain or bnb testnet
+        } else if (blockchain.chainId === 56 || blockchain.chainId === 97) {
             Transactions = new Moralis.Query('BscTransactions');
-        // if the network is Cronos (Mainnet/Testnet)
-        } else if (network.toLowerCase().contains('cronos')) {
+        // if the network is either cronos or cronos testnet
+        } else if (blockchain.chainId === 25 || blockchain.chainId === 338) {
             Transactions = new Moralis.Query('CronosTransactions');
-        // if none of the networks match, Moralis currently doesn't support the network
-        // (and maybe also the fact that our NFTs haven't went to that chain yet)
+        // if the network is either avax or avax testnet
+        } else if (blockchain.chainId === 43114 || blockchain.chainId === 43113) {
+            // Note: Since we haven't had 1 transaction in AVAX, I'm unsure if it is `AvaxTransactions` or `AvalancheTransactions`.
+            // This will be updated accordingly.
+            Transactions = new Moralis.Query('AvaxTransactions');
         } else {
             return {
                 valid: false,
@@ -163,34 +167,38 @@ const invalidateHatchingSignature = async (signature) => {
  * 
  * @param {String} txHash the blockchain transaction hash of the activity (e.g. minting/hatching a Genesis NBMon)
  * @param {String} txType the type of activity (e.g. Genesis NBMon minting/hatching)
- * @param {String} network the blockchain network the activity happened on (e.g. Ethereum Mainnet, abbreviated to 'eth').
+ * @param {Object} blockchain the blockchain network the activity happened on (e.g. Ethereum Mainnet, abbreviated to 'eth').
+ * this object contains both the `name` and the `chainId` of the network, since some network names are unrecognized by ethers.
  * @param {Number} txValue the transaction value (if any, otherwise 0, example when transferring someone some ETH)
  * @return {Object} an object that shows 'OK' if the activity is successfully added and no errors are thrown.
  */
 /* eslint-enable */
-const addToActivities = async (txHash, txType, network, txValue) => {
+const addToActivities = async (txHash, txType, blockchain, txValue) => {
     try {
         // lowercase check for flexibility in small mistypes.
         // if the tx type is genesis nbmon minting
         if (txType.toLowerCase() === 'genesisminting') {
             let NFTTransfers;
 
-            // if the activity is done in Ethereum (Mainnet/Testnet), it automatically gets added to
-            // `EthNFTTransfers`, in Moralis.
-            if (network.toLowerCase().includes('eth')) {
+            // if the network is either eth or goerli
+            if (blockchain.chainId === 1 || blockchain.chainId === 5) {
                 NFTTransfers = new Moralis.Query('EthNFTTransfers');
-            } else if (network.toLowerCase().includes('matic') || network.toLowerCase().includes('polygon')) {
+            // if the network is either matic or mumbai
+            } else if (blockchain.chainId === 137 || blockchain.chainId === 80001) {
                 NFTTransfers = new Moralis.Query('PolygonNFTTransfers');
-            } else if (network.toLowerCase().includes('bsc')) {
+            // if the network is either bnb smart chain or bnb testnet
+            } else if (blockchain.chainId === 56 || blockchain.chainId === 97) {
                 NFTTransfers = new Moralis.Query('BscNFTTransfers');
-            } else if (network.toLowerCase().includes('cronos')) {
+            // if the network is either cronos or cronos testnet
+            } else if (blockchain.chainId === 25 || blockchain.chainId === 338) {
                 NFTTransfers = new Moralis.Query('CronosNFTTransfers');
-            } else if (network.toLowerCase().includes('avax')) {
+            // if the network is either avax or avax testnet
+            } else if (blockchain.chainId === 43114 || blockchain.chainId === 43113) {
                 // Note: Since we haven't had 1 transaction in AVAX, I'm unsure if it is `AvaxNFTTransfers` or `AvalancheNFTTransfers`.
                 // This will be updated accordingly.
                 NFTTransfers = new Moralis.Query('AvaxNFTTransfers');
             } else {
-                throw new Error('Network not supported or `unknown`. For now, only ETH, MATIC, BSC, CRONOS and AVAX are supported in Moralis.');
+                throw new Error('Network not supported or `unknown`. For now, only ETH, MATIC, BSC, CRONOS and AVAX are supported.');
             }
 
             NFTTransfers.equalTo('transaction_hash', txHash);
@@ -215,7 +223,7 @@ const addToActivities = async (txHash, txType, network, txValue) => {
             activities.set('toAddress', to_address);
             activities.set('txHash', txHash);
             activities.set('txType', txType);
-            activities.set('network', network);
+            activities.set('blockchain', blockchain);
             activities.set('txValue', txValue);
             activities.set('timestamp', block_timestamp);
             activities.set('nftName', 'genesisNbmon');
@@ -224,7 +232,7 @@ const addToActivities = async (txHash, txType, network, txValue) => {
             await activities.save(null, { useMasterKey: true });
         // if the tx type is genesis nbmon hatching
         } else if (txType.toLowerCase() === 'genesishatching') {
-            const hatchingSignature = await checkHatchingSignatureValid(network, txHash);
+            const hatchingSignature = await checkHatchingSignatureValid(blockchain, txHash);
 
             // we destructure the object obtained from `hatchingSignature` to get the three variables
             const { valid, data, decodedSignature } = hatchingSignature;
@@ -243,7 +251,7 @@ const addToActivities = async (txHash, txType, network, txValue) => {
                 activities.set('toAddress', to_address);
                 activities.set('txHash', txHash);
                 activities.set('txType', txType);
-                activities.set('network', network);
+                activities.set('blockchain', blockchain);
                 activities.set('txValue', txValue);
                 activities.set('timestamp', block_timestamp);
 
