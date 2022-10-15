@@ -134,11 +134,12 @@ const invalidateHatchingSignature = async (signature) => {
  * this object contains both the `name` and the `chainId` of the network, since some network names are unrecognized by ethers.
  * @param {Number} txValue the transaction value (if any, otherwise 0, example when transferring someone some ETH)
  * @param {String} toAddress the `to` address for this activity. for hatching/minting, `toAddress` is the owner.
- * @param {Number} timestamp the block timestamp of the signed transaction
+ * @param {Number} tokenId the NFT ID
+ * @param {Date} timestamp the activity's block timestamp, converted to date (may not be exactly the same due to code constraints).
  * @return {Object} an object that shows 'OK' if the activity is successfully added and no errors are thrown.
  */
 /* eslint-enable */
-const addToActivities = async (tx, txType, blockchain, txValue, toAddress, timestamp) => {
+const addToActivities = async (tx, txType, blockchain, txValue, toAddress, tokenId, timestamp) => {
     try {
         // lowercase check for flexibility in small mistypes.
         // if the tx type is genesis nbmon minting
@@ -160,6 +161,7 @@ const addToActivities = async (tx, txType, blockchain, txValue, toAddress, times
             activities.set('txType', txType);
             activities.set('blockchain', blockchain);
             activities.set('txValue', txValue);
+            activities.set('tokenId', tokenId);
             activities.set('timestamp', timestamp);
             activities.set('nftName', 'genesisNbmon');
             activities.set('nftContractAddress', process.env.GENESIS_NBMON_ADDRESS);

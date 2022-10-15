@@ -69,6 +69,11 @@ const publicMint = async (toAddress) => {
         // waits for the transaction to be signed and mined.
         await signedTx.wait();
 
+        // getting the block timestamp (since the signedTx doesn't have the block timestamp, this may be slightly off)
+        const blockNumber = await rpcProvider.getBlockNumber();
+        const block = await rpcProvider.getBlock(blockNumber);
+        const blockTimestamp = block.timestamp;
+
         // upon successful minting, the _currentIndex of the GenesisNBMons contract should be incremented by 1.
         // _currentIndex refers to the next NBMon ID to be minted (essentially totalSupply + 1).
         // so here, the mintedId will be the supposed actual ID that was minted.
@@ -112,10 +117,17 @@ const publicMint = async (toAddress) => {
         uploadGenesisEggMetadata(mintedId);
 
         const jsonTx = parseJSON(signedTx);
-        const blockTimestamp = signedTx.timestamp;
 
         // we upload the activity to our custom `UserActivities` class.
-        await addToActivities(jsonTx, 'genesisMinting', blockchain, process.env.MINTING_PRICE, toAddress, blockTimestamp);
+        await addToActivities(
+            jsonTx,
+            'genesisMinting',
+            blockchain,
+            parseInt(Number(process.env.MINTING_PRICE)),
+            toAddress,
+            mintedId,
+            new Date(blockTimestamp * 1000),
+        );
 
         return { nbmonId: mintedId };
     } catch (err) {
@@ -123,7 +135,7 @@ const publicMint = async (toAddress) => {
     }
 };
 
-publicMint('0x8FbFE537A211d81F90774EE7002ff784E352024a');
+publicMint('0x213D2806B07fB2BFCd51fCbC7503755784C72F09');
 
 /**
  * `whitelistedMint` mints a Genesis NBMon egg (whitelisted minting method).
@@ -155,6 +167,11 @@ const whitelistedMint = async (toAddress) => {
         const signedTx = await signer.sendTransaction(unsignedTx);
         // waits for the transaction to be signed and mined.
         await signedTx.wait();
+
+        // getting the block timestamp (since the signedTx doesn't have the block timestamp, this may be slightly off)
+        const blockNumber = await rpcProvider.getBlockNumber();
+        const block = await rpcProvider.getBlock(blockNumber);
+        const blockTimestamp = block.timestamp;
 
         // upon successful minting, the _currentIndex of the GenesisNBMons contract should be incremented by 1.
         // _currentIndex refers to the next NBMon ID to be minted (essentially totalSupply + 1).
@@ -204,10 +221,17 @@ const whitelistedMint = async (toAddress) => {
         uploadGenesisEggMetadata(mintedId);
 
         const jsonTx = parseJSON(signedTx);
-        const blockTimestamp = signedTx.timestamp;
 
         // we upload the activity to our custom `UserActivities` class.
-        await addToActivities(jsonTx, 'genesisMinting', blockchain, process.env.WHITELISTED_MINTING_PRICE, toAddress, blockTimestamp);
+        await addToActivities(
+            jsonTx,
+            'genesisMinting',
+            blockchain,
+            parseInt(Number(process.env.WHITELISTED_MINTING_PRICE)),
+            toAddress,
+            mintedId,
+            new Date(blockTimestamp * 1000),
+        );
 
         return { nbmonId: mintedId };
     } catch (err) {
