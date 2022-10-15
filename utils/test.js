@@ -8,9 +8,7 @@ const decoder = new InputDataDecoder(genesisABI);
 
 
 const test = async () => {
-    const blockNumber = await rpcProvider.getBlockNumber();
-    const timestamp = (await rpcProvider.getBlock(blockNumber)).timestamp;
-    console.log(timestamp);
+    console.log(parseInt(process.env.MINTING_PRICE));
 };
 
 test();

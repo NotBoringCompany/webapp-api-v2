@@ -123,7 +123,7 @@ const publicMint = async (toAddress) => {
             jsonTx,
             'genesisMinting',
             blockchain,
-            parseInt(Number(process.env.MINTING_PRICE)),
+            parseFloat(process.env.MINTING_PRICE),
             toAddress,
             mintedId,
             new Date(blockTimestamp * 1000),
@@ -135,7 +135,7 @@ const publicMint = async (toAddress) => {
     }
 };
 
-publicMint('0x213D2806B07fB2BFCd51fCbC7503755784C72F09');
+publicMint('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
 
 /**
  * `whitelistedMint` mints a Genesis NBMon egg (whitelisted minting method).
@@ -227,7 +227,7 @@ const whitelistedMint = async (toAddress) => {
             jsonTx,
             'genesisMinting',
             blockchain,
-            parseInt(Number(process.env.WHITELISTED_MINTING_PRICE)),
+            parseFloat(process.env.MINTING_PRICE),
             toAddress,
             mintedId,
             new Date(blockTimestamp * 1000),
