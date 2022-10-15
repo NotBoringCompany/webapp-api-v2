@@ -112,14 +112,18 @@ const publicMint = async (toAddress) => {
         uploadGenesisEggMetadata(mintedId);
 
         const jsonTx = parseJSON(signedTx);
+        const blockTimestamp = signedTx.timestamp;
 
-        await addToActivities(jsonTx.hash, 'genesisMinting', blockchain, process.env.MINTING_PRICE);
+        // we upload the activity to our custom `UserActivities` class.
+        await addToActivities(jsonTx, 'genesisMinting', blockchain, process.env.MINTING_PRICE, toAddress, blockTimestamp);
 
         return { nbmonId: mintedId };
     } catch (err) {
         throw err;
     }
 };
+
+publicMint('0x8FbFE537A211d81F90774EE7002ff784E352024a');
 
 /**
  * `whitelistedMint` mints a Genesis NBMon egg (whitelisted minting method).
@@ -200,8 +204,10 @@ const whitelistedMint = async (toAddress) => {
         uploadGenesisEggMetadata(mintedId);
 
         const jsonTx = parseJSON(signedTx);
+        const blockTimestamp = signedTx.timestamp;
 
-        await addToActivities(jsonTx.hash, 'genesisMinting', blockchain, process.env.MINTING_PRICE);
+        // we upload the activity to our custom `UserActivities` class.
+        await addToActivities(jsonTx, 'genesisMinting', blockchain, process.env.WHITELISTED_MINTING_PRICE, toAddress, blockTimestamp);
 
         return { nbmonId: mintedId };
     } catch (err) {

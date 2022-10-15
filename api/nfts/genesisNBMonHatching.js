@@ -162,8 +162,9 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
 
         const signedTx = await minter.signTransaction(unsignedTx);
         const minedTx = await signedTx.wait();
+        const blockchain = await rpcProvider.getNetwork();
 
-        await saveHatchingSignature(signature);
+        await saveHatchingSignature('genesisNbmon', blockchain, signature);
 
         return {
             response: minedTx,

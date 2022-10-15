@@ -353,6 +353,30 @@ const getGenesisNBMonAlt = async (id) => {
 };
 
 /**
+ * `updateGenesisNBMonsMoralis` updates the `MintedNFTs` class with all up to date Genesis NBMons from the blockchain.
+ * This function is mostly called due to errors during minting/hatching which leads to the class not having correct or missing NBMons.
+ * This function will call `getNFTs` from the blockchain which will check if there are discrepancies between the class' and blockchain's data.
+ * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ */
+const updateGenesisNBMonsMoralis = async () => {
+    try {
+        // we are trying to fetch ALL current Genesis NBMons from the `MintedNFTs` class.
+        const MintedNFTs = new Moralis.Query('MintedNFTs');
+        MintedNFTs.equalTo('nftContract', process.env.GENESIS_NBMON_ADDRESS);
+
+        const nbmons = await MintedNFTs.find({ useMasterKey: true });
+
+        if (nbmons === undefined || nbmons.length === 0) {
+            throw new Error('Cannot find Genesis NBMons. Please check Moralis or this code.');
+        }
+
+        // now we will obtain all NBMons that are minted from the blockchain.
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
  * `changeOwnership` changes the ownership of a Genesis NBMon.
  * NOTE: `safeTransferFrom` NEEDS TO BE CALLED FROM FRONTEND BEFOREHAND!
  * You are essentially able to also change ownership by using the `safeTransferFrom` option from the Genesis NBMon smart contract, however:

@@ -119,4 +119,5 @@ const addTotalTradingVolume = async (address, amount) => {
 module.exports = {
     addMonthlyTradingVolume,
     resetMonthlyTradingVolume,
+    addTotalTradingVolume,
 };

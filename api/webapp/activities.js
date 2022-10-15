@@ -11,7 +11,6 @@ const genesisABI = require(`${__dirname}/../../abi/genesisNBMon.json`);
 const decoder = new InputDataDecoder(genesisABI);
 
 const Moralis = require('moralis-v1/node');
-const { parseJSON } = require('../../utils/jsonParser');
 
 /**
  * `saveHatchingSignature` saves the newly generated hatching signature of ANY hatchable NFT (not only NBMons) to Moralis.
@@ -19,15 +18,17 @@ const { parseJSON } = require('../../utils/jsonParser');
  * This method is a part of adding a 'hatching event' to the user's activities list.
  * For more information, see `addToActivities`, `checkHatchingSignatureValid` and `invalidateHatchingSignature`.
  * @param {String} nftName the name of the NFT that the signature belongs to. (e.g. `genesisNbmon`).
+ * @param {Object} blockchain the blockchain network the hatching happened in.
  * @param {String} signature the signature obtained by calling `hatchingHash` and signing it with the minter's private key.
  * @return {Object} an OK status if the saving is successful.
  */
-const saveHatchingSignature = async (nftName, signature) => {
+const saveHatchingSignature = async (nftName, blockchain, signature) => {
     try {
         const HatchingSignatures = Moralis.Object.extend('HatchingSignatures');
         const hatchingSignatures = new HatchingSignatures();
 
         hatchingSignatures.set('signature', signature);
+        hatchingSignatures.set('blockchain', blockchain);
         hatchingSignatures.set('addedToActivities', false);
         hatchingSignatures.set('nftName', nftName);
 
@@ -46,61 +47,23 @@ const saveHatchingSignature = async (nftName, signature) => {
  * Valid here means:
  * 1. An egg has been hatched with that signature AND
  * 2. this hatching 'event' hasn't been added to the user's activity list yet.
- * @param {Object} blockchain the blockchain network the activity happened on (e.g. Ethereum Mainnet, abbreviated to 'eth').
  * this object contains both the `name` and the `chainId` of the network, since some network names are unrecognized by ethers.
- * @param {String} txHash the transaction hash of the activity.
+ * @param {Object} tx the transaction object of the activity.
  * @return {Object} an object that contains `valid`, `data` and `decodedSignature`.
  */
-const checkHatchingSignatureValid = async (blockchain, txHash) => {
+const checkHatchingSignatureValid = async (tx) => {
     try {
-        let Transactions;
-
-        // if the network is either eth or goerli
-        if (blockchain.chainId === 1 || blockchain.chainId === 5) {
-            Transactions = new Moralis.Query('EthTransactions');
-        // if the network is either matic or mumbai
-        } else if (blockchain.chainId === 137 || blockchain.chainId === 80001) {
-            Transactions = new Moralis.Query('PolygonTransactions');
-        // if the network is either bnb smart chain or bnb testnet
-        } else if (blockchain.chainId === 56 || blockchain.chainId === 97) {
-            Transactions = new Moralis.Query('BscTransactions');
-        // if the network is either cronos or cronos testnet
-        } else if (blockchain.chainId === 25 || blockchain.chainId === 338) {
-            Transactions = new Moralis.Query('CronosTransactions');
-        // if the network is either avax or avax testnet
-        } else if (blockchain.chainId === 43114 || blockchain.chainId === 43113) {
-            // Note: Since we haven't had 1 transaction in AVAX, I'm unsure if it is `AvaxTransactions` or `AvalancheTransactions`.
-            // This will be updated accordingly.
-            Transactions = new Moralis.Query('AvaxTransactions');
-        } else {
-            return {
-                valid: false,
-                data: null,
-                decodedSignature: null,
-            };
-        }
-
-        Transactions.equalTo('hash', txHash);
-        const transactions = await Transactions.first({ useMasterKey: true });
-
-        if (transactions === undefined) {
-            return {
-                valid: false,
-                data: null,
-                decodedSignature: null,
-            };
-        };
-
-        const transactionsResult = parseJSON(transactions);
+        // we get the data input for the transaction
+        const txData = tx.data;
 
         // checks from all hatching signatures that are valid
         const HatchingSignatures = new Moralis.Query('HatchingSignatures');
-        const decodedInput = decoder.decodeData(transactionsResult.input);
+        const decodedInput = decoder.decodeData(txData);
         // this is the hatching signature obtained from the transaction input
-        const sigFromTxInput = decodedInput.inputs[0];
+        const sigFromTxData = decodedInput.inputs[0];
 
         // here we check for two validities: that the signature matches and that `addedToActivities` is false.
-        HatchingSignatures.equalTo('signature', sigFromTxInput);
+        HatchingSignatures.equalTo('signature', sigFromTxData);
         HatchingSignatures.equalTo('addedToActivities', false);
 
         const hatchingSignatures = await HatchingSignatures.first({ useMasterKey: true });
@@ -109,8 +72,8 @@ const checkHatchingSignatureValid = async (blockchain, txHash) => {
         if (hatchingSignatures !== undefined && decodedInput.method === 'hatchFromEgg') {
             return {
                 valid: true,
-                data: transactionsResult,
-                decodedSignature: sigFromTxInput,
+                data: tx,
+                decodedSignature: sigFromTxData,
             };
         }
 
@@ -165,91 +128,62 @@ const invalidateHatchingSignature = async (signature) => {
  * Note: Currently, `addToActivities` only supports chains that are supported by Moralis. This includes:
  * ETH, BSC, MATIC, CRONOS and AVAX. Other chains will need to have a special function dedicated to them. Work in progress.
  * 
- * @param {String} txHash the blockchain transaction hash of the activity (e.g. minting/hatching a Genesis NBMon)
+ * @param {Object} tx the blockchain transaction object of the activity (e.g. minting/hatching a Genesis NBMon)
  * @param {String} txType the type of activity (e.g. Genesis NBMon minting/hatching)
  * @param {Object} blockchain the blockchain network the activity happened on (e.g. Ethereum Mainnet, abbreviated to 'eth').
  * this object contains both the `name` and the `chainId` of the network, since some network names are unrecognized by ethers.
  * @param {Number} txValue the transaction value (if any, otherwise 0, example when transferring someone some ETH)
+ * @param {String} toAddress the `to` address for this activity. for hatching/minting, `toAddress` is the owner.
+ * @param {Number} timestamp the block timestamp of the signed transaction
  * @return {Object} an object that shows 'OK' if the activity is successfully added and no errors are thrown.
  */
 /* eslint-enable */
-const addToActivities = async (txHash, txType, blockchain, txValue) => {
+const addToActivities = async (tx, txType, blockchain, txValue, toAddress, timestamp) => {
     try {
         // lowercase check for flexibility in small mistypes.
         // if the tx type is genesis nbmon minting
         if (txType.toLowerCase() === 'genesisminting') {
-            let NFTTransfers;
+            // the tx hash
+            const txHash = tx.hash;
+            // from address for minting is always from the `dead address`
+            const fromAddress = '0x0000000000000000000000000000000000000000';
 
-            // if the network is either eth or goerli
-            if (blockchain.chainId === 1 || blockchain.chainId === 5) {
-                NFTTransfers = new Moralis.Query('EthNFTTransfers');
-            // if the network is either matic or mumbai
-            } else if (blockchain.chainId === 137 || blockchain.chainId === 80001) {
-                NFTTransfers = new Moralis.Query('PolygonNFTTransfers');
-            // if the network is either bnb smart chain or bnb testnet
-            } else if (blockchain.chainId === 56 || blockchain.chainId === 97) {
-                NFTTransfers = new Moralis.Query('BscNFTTransfers');
-            // if the network is either cronos or cronos testnet
-            } else if (blockchain.chainId === 25 || blockchain.chainId === 338) {
-                NFTTransfers = new Moralis.Query('CronosNFTTransfers');
-            // if the network is either avax or avax testnet
-            } else if (blockchain.chainId === 43114 || blockchain.chainId === 43113) {
-                // Note: Since we haven't had 1 transaction in AVAX, I'm unsure if it is `AvaxNFTTransfers` or `AvalancheNFTTransfers`.
-                // This will be updated accordingly.
-                NFTTransfers = new Moralis.Query('AvaxNFTTransfers');
-            } else {
-                throw new Error('Network not supported or `unknown`. For now, only ETH, MATIC, BSC, CRONOS and AVAX are supported.');
-            }
-
-            NFTTransfers.equalTo('transaction_hash', txHash);
-            const nftTransfers = await NFTTransfers.first({ useMasterKey: true });
-
-            if (nftTransfers === undefined) {
-                throw new Error('Either the transaction hash is invalid or is not added yet to Moralis. Please check again later.');
-            }
-
-            const result = parseJSON(nftTransfers);
-
-            /* eslint-disable-next-line */
-            const { from_address, to_address, block_timestamp } = result;
-
-            // after obtaining the three variables above, we are now ready to plug it into our custom UserActivities class.
+            // we are going to plug the data into our custom UserActivities class.
             const Activities = Moralis.Object.extend('UserActivities');
             const activities = new Activities();
 
-            // to_address is the user, which in this case is the 'owner' of the activity.
-            activities.set('activityOwnerAddress', to_address);
-            activities.set('fromAddress', from_address);
-            activities.set('toAddress', to_address);
+            // in this case, `fromAddress` will be the dead address and `toAddress` is the owner of the nbmon.
+            activities.set('activityOwnerAddress', toAddress);
+            activities.set('fromAddress', fromAddress);
+            activities.set('toAddress', toAddress);
             activities.set('txHash', txHash);
             activities.set('txType', txType);
             activities.set('blockchain', blockchain);
             activities.set('txValue', txValue);
-            activities.set('timestamp', block_timestamp);
+            activities.set('timestamp', timestamp);
             activities.set('nftName', 'genesisNbmon');
             activities.set('nftContractAddress', process.env.GENESIS_NBMON_ADDRESS);
 
             await activities.save(null, { useMasterKey: true });
         // if the tx type is genesis nbmon hatching
         } else if (txType.toLowerCase() === 'genesishatching') {
-            const hatchingSignature = await checkHatchingSignatureValid(blockchain, txHash);
+            const hatchingSignature = await checkHatchingSignatureValid(tx);
 
             // we destructure the object obtained from `hatchingSignature` to get the three variables
-            const { valid, data, decodedSignature } = hatchingSignature;
+            const { valid, decodedSignature } = hatchingSignature;
 
             if (valid) {
-                /* eslint-disable-next-line */
-                const { from_address, to_address, block_timestamp } = data;
+                const hash = tx.hash;
 
                 // after obtaining the three variables above, we are now ready to plug it into our custom UserActivities class.
                 const Activities = Moralis.Object.extend('UserActivities');
                 const activities = new Activities();
 
-                // in this case, the owner is the one hatching the egg, which means that the `fromAddress` should be the owner.
-                activities.set('activityOwnerAddress', from_address);
-                activities.set('fromAddress', from_address);
-                activities.set('toAddress', to_address);
-                activities.set('txHash', txHash);
+                // in this case, `both fromAddress` and `toAddress` are the owner of the nbmon (since hatching is not a transfer).
+                activities.set('activityOwnerAddress', toAddress);
+                activities.set('fromAddress', toAddress);
+                activities.set('toAddress', toAddress);
+                activities.set('txHash', hash);
                 activities.set('txType', txType);
                 activities.set('blockchain', blockchain);
                 activities.set('txValue', txValue);

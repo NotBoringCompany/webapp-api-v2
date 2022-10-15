@@ -1,9 +1,6 @@
 - talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
-- convert `network` string to `blockchain` object foppr `addToActivities` and everything else since a lot of them have no names. this means that we have to manually add it ourselves.
-- Create addToActivities, import to genesisNBMonMinting API
-- Create uploadGenesisEggMetadata, import to genesisNBMonMinting API
-- declare uploadGenesisEggMetadata and addToActivities in `publicMint`
 - Create an emergency check for GenesisNBMons class in Moralis (just in case some minted NBMons are not added so that it can manually be added to the Moralis DB).
+- convert `addToActivities` to take the tx directly from the minting function and destructure it (instead of having to query NftTransfers in moralis, since that's not necessary imo)
 - Change hatching duration in `publicMint` for proper production.
 - remove console.logs (later on)
 - remove require dotenv and moralis imports from all fiels apart from server.js
@@ -15,9 +12,12 @@
 - if a user wants to transfer ownership of an nft, we need the frontend to call `safeTransferFrom` before calling `changeOwnership`.
 - later on: since our code only supports evm chains, we need to include non-evm chains later on.
 - Use scheduler to call `resetMonthlyTradingVolume`.
+- Since NBMons and NFTs can be sold in OpenSea, we need to notify the user if they buy/sell in the web app or somewhere that they have to go to the inventory and update their NFT inventory manually.
+Alternatively, whenever they log in to the game, it should also call the Web App API and call this function. Or we can also use a scheduler to call this function every X minutes.
 
 - IMPORTANT: change ALL genesis testing contract instances (e.g. process.env.GENESIS_NBMON_TESTING_ADDRESS) to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
 and in `getGenesisNBMonOwner` where querying in Moralis is needed, also on other files.
+- IMPORTANT: change the `salesFee` in `MarketplaceCore.sol (blockchain folder)` to depend on the web app tier instead of being fixed. NOTE: take into account the hunter association card as well.
 - IMPORTANT: Gaming Backend Repo needs to be changed with the changes in the new moralis db.
 - IMPORTANT: security implementation for `uploadGenesisEggMetadata` as now anyone can just call and upload it.
 - IMPORTANT: security implementation for ALL new moralis classes in new DB. they are still publicly open for read and write.
@@ -44,13 +44,14 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 14. `saveHatchingSignature` now has a `nftName` parameter for clarity on which nft it is, since it doesn't only save Genesis NBMons' signatures. 
 15. `saveHatchingSignature` now returns an Object that shows an "OK" code if successful.
 16. `saveHatchingSignature` now has a try and error block catch, instead of no error handling in the v1 backend.
-17. `addToActivities` now accepts `txHash` and `txType` to shorten the parameters instead of `transactionHash` and `transactionType`.
+16.1. `saveHatchingSIgnature` now accepts a ` blockchain` parameter to save the blockchain name + chain ID (object).
+17. `addToActivities` now accepts `tx` object, `txType`, `blockchain`, `txValue`, `toAddress`, `timestamp`.
 18. `updateHatchedNBMon` now accepts `nbmonId` instead of `id` as a parameter.
 19. `userTransactionsActivities` class in Moralis is now `UserActivities`. Some fields inside the class are also renamed.
 20. `value` is renamed to `txValue` in `UserActivities` class and is now a number type, not a string.
 21. instead of only `nbmonId`, `UserActivities` class now accepts `tokenId`, `nftContractAddress` and `nftName` for further clarity and to accept ALL nfts.
-22. `checkHatchingSignatureValid` now accepts `txHash` instead of `hash` as a parameter.
-23. `checkhatchingSignatureValid` now has a new parameter, `network`, to check for the network that the activity was conducted in.
+22. `checkHatchingSignatureValid` now accepts `tx` object instead of `txHash`.
+23. all of `activities.js` now no longer uses Moralis' TX classes to search for input/hashes. the tx object/hash will be passed on via the parent method.
 24. `generalConfig` now returns `timestamps` instead of `timeStamps` (camel-case change).
 25. `supplies` from `generalConfig` now returns { minted, supplyLimit } instead of { haveBeenMinted, supplyLimit }
 26. `timestamps` now returns { now, publicOpen, whitelistOpen, mintingClosed, isPublicOpen, isWhitelistOpen, isMintingEnded } instead of { now, publicOpenAt, whitelistOpenAt, mintingCloseAt, isWhitelistOpen, isPublicOpen, isMintingEnded }
@@ -70,3 +71,4 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 40. `getOwnerGenesisNBMonsAlt` is now `getOwnedGenesisNBMonsAlt`.
 41. changed `network` in `UserActivities` to `blockchain`. this is because some networks like cronos testnet cannot be detected by Moralis, and the name is 'unknown'.
 this is why it's better to save the blockchain object with its chain ID + name just in case one of them doesn't show.
+42. IMPORTANT: paymentToken needs to follow CoinGecko's symbol syntax since we're using their API.
