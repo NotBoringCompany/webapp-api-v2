@@ -253,6 +253,10 @@ const groupByDate = (jsonQueryResult) => {
 
         return objectStore;
     });
+
+    return Object.keys(objectStore)
+        .map((key) => objectStore[key])
+        .reverse(); // return grouped by its date - this is to fulfil the frontend's (UI) requirement
 };
 
 module.exports = {
