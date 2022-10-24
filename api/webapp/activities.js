@@ -11,6 +11,27 @@ const genesisABI = require(`${__dirname}/../../abi/genesisNBMon.json`);
 const decoder = new InputDataDecoder(genesisABI);
 
 const Moralis = require('moralis-v1/node');
+const { parseJSON } = require('../../utils/jsonParser');
+
+/**
+ * `getUserActivities` gets a list of activities of `address`.
+ * @param {String} address the address of the user.
+ * @return {Object} an object with the user's activities.
+ */
+const getUserActivities = async (address) => {
+    try {
+        const Activities = new Moralis.Query('UserActivities');
+        Activities.equalTo('activityOwnerAddress', address);
+
+        const query = await Activities.find({ useMasterKey: true });
+
+        const jsonQueryResult = parseJSON(query);
+
+        return groupByDate(jsonQueryResult);
+    } catch (err) {
+        throw err;
+    }
+};
 
 /**
  * `saveHatchingSignature` saves the newly generated hatching signature of ANY hatchable NFT (not only NBMons) to Moralis.
@@ -265,4 +286,5 @@ module.exports = {
     invalidateHatchingSignature,
     addToActivities,
     groupByDate,
+    getUserActivities,
 };
