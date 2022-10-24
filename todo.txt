@@ -1,6 +1,4 @@
 - talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
-- Create an emergency check for GenesisNBMons class in Moralis (just in case some minted NBMons are not added so that it can manually be added to the Moralis DB).
-- convert `addToActivities` to take the tx directly from the minting function and destructure it (instead of having to query NftTransfers in moralis, since that's not necessary imo)
 - Change hatching duration in `publicMint` for proper production.
 - remove console.logs (later on)
 - remove require dotenv and moralis imports from all fiels apart from server.js
@@ -72,3 +70,5 @@ instantly just reuploads to the same URI instead of deleting the Object in the B
 41. changed `network` in `UserActivities` to `blockchain`. this is because some networks like cronos testnet cannot be detected by Moralis, and the name is 'unknown'.
 this is why it's better to save the blockchain object with its chain ID + name just in case one of them doesn't show.
 42. IMPORTANT: paymentToken needs to follow CoinGecko's symbol syntax since we're using their API.
+43. `updateGenesisNBmonsByAddress` is now implemented to ensure that any discrepancies between the blockchain and Moralis can be updated using this fn for genesis NBMons.
+44. `addToActivities` now gets the tx directly as a parameter instead of having to query the `nftTransfers` class.

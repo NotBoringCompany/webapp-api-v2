@@ -213,9 +213,52 @@ const addToActivities = async (tx, txType, blockchain, txValue, toAddress, token
     }
 };
 
+/**
+ * `groupByDate` takes a json query result object and groups its data by their date.
+ * @param {Object} jsonQueryResult the result of a JSON query object.
+ * @return {Object} an object grouped by its date
+ */
+const groupByDate = (jsonQueryResult) => {
+    const objectStore = {};
+
+    jsonQueryResult.map((obj) => {
+        const groupByDateWithoutTime = `${moment(
+            new Date(obj.timestamp.iso),
+        ).format('DD')} ${moment(
+            new Date(obj.timestamp.iso),
+        ).format('MMMM')} ${moment(
+            new Date(obj.timestamp.iso),
+        ).format('YYYY')}`;
+
+        const newTimestamp = new Date(obj.timestamp.iso);
+
+        if (groupByDateWithoutTime in object) {
+            objectStore[groupByDateWithoutTime].data.push({
+                ...obj,
+                timestamp: newTimestamp,
+                utcTime: moment(newTimestamp).utcOffset(0).format('HH:mm'),
+            });
+        } else {
+            objectStore[groupByDateWithoutTime] = {
+                data: [
+                    {
+                        ...obj,
+                        timestamp: newTimestamp,
+                        utcTime: moment(newTimestamp).utcOffset(0).format('HH:mm'),
+                    },
+                ],
+                dateGroup: groupByDateWithoutTime,
+            };
+        }
+
+        return objectStore;
+    });
+};
+
 module.exports = {
     saveHatchingSignature,
     checkHatchingSignatureValid,
     invalidateHatchingSignature,
     addToActivities,
+    groupByDate,
 };
