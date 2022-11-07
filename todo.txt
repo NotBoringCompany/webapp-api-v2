@@ -1,3 +1,4 @@
+- add currency and tier logic + `addUserData` etc from accountLogic.js
 - talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
 - Change hatching duration in `publicMint` for proper production.
 - remove console.logs (later on)
@@ -72,3 +73,5 @@ this is why it's better to save the blockchain object with its chain ID + name j
 42. IMPORTANT: paymentToken needs to follow CoinGecko's symbol syntax since we're using their API.
 43. `updateGenesisNBmonsByAddress` is now implemented to ensure that any discrepancies between the blockchain and Moralis can be updated using this fn for genesis NBMons.
 44. `addToActivities` now gets the tx directly as a parameter instead of having to query the `nftTransfers` class.
+45. all web app tiers are now the under `webAppTiers` object
+46. `sendEmail` now accepts `email` instead of `emailAddress`.

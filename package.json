@@ -19,9 +19,11 @@
     "ethers": "^5.7.1",
     "express": "^4.18.1",
     "fs": "^0.0.1-security",
+    "googleapis": "^109.0.1",
     "moment": "^2.29.4",
     "moralis": "^2.4.0",
     "moralis-v1": "^1.11.0",
+    "nodemailer": "^6.8.0",
     "nodemon": "^2.0.20",
     "path": "^0.12.7"
   },
