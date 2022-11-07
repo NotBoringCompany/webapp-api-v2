@@ -186,14 +186,18 @@ const createPasswordResetRequest = async (email) => {
  * @return {Object} the user object or null if it doesn't exist
  */
 const getUser = async (email) => {
-    const users = Moralis.Object.extend('_User');
+    try {
+        const users = Moralis.Object.extend('_User');
 
-    const userQuery = new Moralis.Query(users);
-    userQuery.equalTo('email', email.toLowerCase());
-    const queryResult = await userQuery.first({ useMasterKey: true });
-    if (queryResult) return JSON.parse(JSON.stringify(queryResult));
+        const userQuery = new Moralis.Query(users);
+        userQuery.equalTo('email', email.toLowerCase());
+        const queryResult = await userQuery.first({ useMasterKey: true });
+        if (queryResult) return JSON.parse(JSON.stringify(queryResult));
 
-    return null;
+        return null;
+    } catch (err) {
+        throw err;
+    }
 };
 
 /**
@@ -208,7 +212,7 @@ const userLogin = async (login, password) => {
 
         return { status: 'ok', sessionToken: user.get('sessionToken'), userUniqueHash: user.get('userUniqueHash') };
     } catch (err) {
-        throw err.message;
+        throw err;
     }
 };
 
@@ -217,16 +221,19 @@ const userLogin = async (login, password) => {
  * @param {String} tokenId the token ID
  */
 const deleteRequest = async (tokenId) => {
-    const passwordResetRequests = Moralis.Object.extend('ForgotPasswordRequests');
+    try {
+        const passwordResetRequests = Moralis.Object.extend('ForgotPasswordRequests');
 
-    const passwordResetRequestQuery = new Moralis.Query(passwordResetRequests);
-    passwordResetRequestQuery.equalTo('tokenId', tokenId);
+        const passwordResetRequestQuery = new Moralis.Query(passwordResetRequests);
+        passwordResetRequestQuery.equalTo('tokenId', tokenId);
 
-    const object = await passwordResetRequestQuery.first({
-        useMasterKey: true,
-    });
+        const object = await passwordResetRequestQuery.first({
+            useMasterKey: true,
+        });
 
-    if (object) object.destroy({ useMasterKey: true });
+        if (object) object.destroy({ useMasterKey: true });
+    } catch (err) {
+        throw err;
 };
 
 module.exports = {
