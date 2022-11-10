@@ -8,6 +8,7 @@ const { parseJSON } = require('../../utils/jsonParser');
 const { getWebAppTier, getNftsOwned } = require('./tierSystem');
 const { getWebAppTierBenefits, getClaimingFeeAndLimits } = require('../../utils/webAppTiers');
 const { getEvmAddress } = require('../../utils/getAddress');
+const { canDeposit, claimingCheck } = require('../../middlewares/currencyLimit');
 const axios = require('axios').default;
 
 const titleId = process.env.PLAYFAB_TITLE_ID;
@@ -400,7 +401,6 @@ const claimxRES = async (amount, playfabId) => {
 
         // MIDDLEWARE CHECKS (CAN CLAIM + CLAIMING COOLDOWN + LIMITS)
         /* eslint-disable-next-line */
-        ///////////////////////// TO DO!!!!!!!!! /////////////////////////
         const { onCooldown, claimable, isWithinLimits } = await claimingCheck(
             'xres',
             amount,
