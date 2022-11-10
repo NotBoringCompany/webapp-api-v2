@@ -234,6 +234,7 @@ const deleteRequest = async (tokenId) => {
         if (object) object.destroy({ useMasterKey: true });
     } catch (err) {
         throw err;
+    }
 };
 
 module.exports = {
@@ -245,4 +246,3 @@ module.exports = {
     sendPasswordResetRequest,
     sendEmail,
 };
-

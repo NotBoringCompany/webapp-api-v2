@@ -1,8 +1,12 @@
 - add currency and tier logic + `addUserData` etc from accountLogic.js
+- web app tier logic accepts an ethereum address only for now. if we go with solana etc, we need to accept these addresses as well. probably should add another field in the class in Moralis.
 - talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
+- create non hard-coded requirements for the tiers (e.g. rn tier requirements are hardcoded)
+- for now, `InGameData` is changed to `RealmHunterData` since other games will have other in game data tier requirements. remember to change this when we create more games!
 - Change hatching duration in `publicMint` for proper production.
 - remove console.logs (later on)
 - remove require dotenv and moralis imports from all fiels apart from server.js
+- add more nfts in `getNftsOwned` when more nfts are implemented. rn it's only for nbmons.
 - test if `checkHatchingSignatureValid` works with the decoder after some variables are changed.
 - convert `generalConfig` and `config` to be dynamic and support a `contract` parameter instead of making it in multiple files (meaning that it's not only bound for genesis nbmon contracts).
 - Later on: once more activities apart from genesisMinting and hatching are available, change `addToActivities` to include them.
@@ -75,3 +79,4 @@ this is why it's better to save the blockchain object with its chain ID + name j
 44. `addToActivities` now gets the tx directly as a parameter instead of having to query the `nftTransfers` class.
 45. all web app tiers are now the under `webAppTiers` object
 46. `sendEmail` now accepts `email` instead of `emailAddress`.
+47. all functions in `tierSystem.js` accepts `address` instead of `ethAddress`.
