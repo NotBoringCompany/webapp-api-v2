@@ -22,6 +22,27 @@ const getWebAppTierBenefits = (tier) => {
 };
 
 /**
+ * `getClaimingFeeAndLimits` gets the claiming fee and limits of the web app tier from `webAppTiers`
+ * @param {String} tier the web app tier
+ * @return {Object} the claiming fee and limits of the web app tier
+ */
+const getClaimingFeeAndLimits = (tier) => {
+    const claimFee = getWebAppTierBenefits(tier)['claimFee'];
+    const minimumxRECClaim = (getWebAppTierBenefits(tier))['minimumxRECClaim'];
+    const maximumxRECClaim = (getWebAppTierBenefits(tier))['maximumxRECClaim'];
+    const minimumxRESClaim = (getWebAppTierBenefits(tier))['minimumxRESClaim'];
+    const maximumxRESClaim = (getWebAppTierBenefits(tier))['maximumxRESClaim'];
+
+    return {
+        claimFee: claimFee,
+        minimumxRECClaim: minimumxRECClaim,
+        maximumxRECClaim: maximumxRECClaim,
+        minimumxRESClaim: minimumxRESClaim,
+        maximumxRESClaim: maximumxRESClaim,
+    };
+};
+
+/**
  * @dev `webAppTiers` is an object that contains all the available web app tiers.
  * Note: Some of these benefits MAY change in the future, depending on balancing factors.
  */
@@ -168,4 +189,5 @@ const webAppTiers = {
 module.exports = {
     webAppTiers,
     getWebAppTierBenefits,
+    getClaimingFeeAndLimits,
 };

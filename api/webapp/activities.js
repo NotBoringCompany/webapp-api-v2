@@ -15,7 +15,7 @@ const { parseJSON } = require('../../utils/jsonParser');
 
 /**
  * `getUserActivities` gets a list of activities of `address`.
- * @param {String} address the address of the user.
+ * @param {String} address the EVM address of the user.
  * @return {Object} an object with the user's activities.
  */
 const getUserActivities = async (address) => {

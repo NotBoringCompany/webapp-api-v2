@@ -1,3 +1,6 @@
+- add claimingCheck middleware for `claimxRES`.
+- add canDeposit middleware for `depositRES`.
+- talk to alvin to change `ethAddress` to `evmAddress`. once done, change all `ethAddress` fields to `evmAddress` in this codebase.
 - add currency and tier logic + `addUserData` etc from accountLogic.js
 - web app tier logic accepts an ethereum address only for now. if we go with solana etc, we need to accept these addresses as well. probably should add another field in the class in Moralis.
 - talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
@@ -15,9 +18,11 @@
 - if a user wants to transfer ownership of an nft, we need the frontend to call `safeTransferFrom` before calling `changeOwnership`.
 - later on: since our code only supports evm chains, we need to include non-evm chains later on.
 - Use scheduler to call `resetMonthlyTradingVolume`.
+- change the `mintToAdmin` to treasury later on since we're gonna have a treasury contract.
 - Since NBMons and NFTs can be sold in OpenSea, we need to notify the user if they buy/sell in the web app or somewhere that they have to go to the inventory and update their NFT inventory manually.
 Alternatively, whenever they log in to the game, it should also call the Web App API and call this function. Or we can also use a scheduler to call this function every X minutes.
 
+- IMPORTANT: if we go with solana or any non evm chain, REMEMBER TO ACCEPT NON EVM ADDRESSES FOR QUERYING! (ALSO TELL THIS TO GAME DEV TO CHANGE PLAYFAB!!!!)
 - IMPORTANT: change ALL genesis testing contract instances (e.g. process.env.GENESIS_NBMON_TESTING_ADDRESS) to genesis actual contract later on for the genesis contract declaration like in new ethers.Contract
 and in `getGenesisNBMonOwner` where querying in Moralis is needed, also on other files.
 - IMPORTANT: change the `salesFee` in `MarketplaceCore.sol (blockchain folder)` to depend on the web app tier instead of being fixed. NOTE: take into account the hunter association card as well.
@@ -80,3 +85,4 @@ this is why it's better to save the blockchain object with its chain ID + name j
 45. all web app tiers are now the under `webAppTiers` object
 46. `sendEmail` now accepts `email` instead of `emailAddress`.
 47. all functions in `tierSystem.js` accepts `address` instead of `ethAddress`.
+48. all functions in `currencies.js` accepts `address` instead of `ethAddress`.
