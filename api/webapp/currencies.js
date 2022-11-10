@@ -5,7 +5,7 @@ const Moralis = require('moralis-v1/node');
 const fs = require('fs');
 const path = require('path');
 const { parseJSON } = require('../../utils/jsonParser');
-const { getWebAppTier } = require('./tierSystem');
+const { getWebAppTier, getNftsOwned } = require('./tierSystem');
 const { getWebAppTierBenefits, getClaimingFeeAndLimits } = require('../../utils/webAppTiers');
 const { getEvmAddress } = require('../../utils/getAddress');
 const axios = require('axios').default;
@@ -33,9 +33,58 @@ const resContract = new ethers.Contract(
     rpcProvider,
 );
 
+/**
+ * `getAllWebAppData` gets all web app related data.
+ * @param {String} address the EVM address of the user
+ * @return {Object} with all web app related data
+ */
 const getAllWebAppData = async (address) => {
     try {
+        const webAppData = new Moralis.Query('WebAppData');
+        webAppData.equalTo('address', address);
 
+        const result = await webAppData.first({ useMasterKey: true });
+
+        if (!result) {
+            throw new Error('User with given EVM address does not exist in WebAppData');
+        }
+
+        const playfabId = parseJSON(result)['playfabId'];
+
+        if (!playfabId) {
+            throw new Error('Cannot fully query without Playfab ID. Please require the user to add a playfab ID using `addPlayfabId`.');
+        }
+
+        // get RES allowance of the user
+        const resAllowance = await getRESAllowance(ethAddress);
+        // get owned xRES of user (from playfab account)
+        const ownedxRES = await getOwnedxRESFromAddress(ethAddress);
+        // get owned RES of user (from blockchain)
+        const ownedRES = await getOwnedRES(ethAddress);
+        // get user RES transactions (total RES deposited + xRES claimed)
+        const resTransactions = await userRESTransactions(ethAddress);
+        // get user's claim cooldown time for xRES and xREC
+        const claimCooldown = await getClaimCooldown(ethAddress);
+        // get user's web app tier
+        const webAppTier = await getWebAppTier(ethAddress);
+        // get nfts owned by user
+        const nftsOwned = await getNftsOwned(address);
+        // get user's claiming fee and limits
+        const claimingInfo = getClaimingFeeAndLimits(webAppTier);
+        // get all web app tier benefits of user
+        const webAppTierBenefits = getWebAppTierBenefits(webAppTier);
+
+        return {
+            resAllowance: resAllowance,
+            ownedxRES: ownedxRES,
+            ownedRES: ownedRES,
+            resTransactions: resTransactions,
+            claimCooldown: claimCooldown,
+            webAppTier: webAppTier,
+            nftsOwned: nftsOwned,
+            claimingInfo: claimingInfo,
+            webAppTierBenefits: webAppTierBenefits,
+        };
     } catch (err) {
         throw err;
     }
@@ -471,6 +520,12 @@ const claimxRES = async (amount, playfabId) => {
     }
 };
 
+/**
+ * `depositRES` deposits the user's RES for xRES from the blockchain to their playfab accounts.
+ * @param {Float} amount the amount of RES to be deposited
+ * @param {String} playfabId the PlayFab ID of the user
+ * @return {Object} with several status messages if everything is okay.
+ */
 const depositRES = async (amount, playfabId) => {
     try {
         const currentOwnedxRES = await getOwnedxRES(playfabId);
