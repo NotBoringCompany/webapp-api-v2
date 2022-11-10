@@ -26,10 +26,24 @@ const genesisContract = new ethers.Contract(
 
 /**
  * `updateWebAppData` updates the user's web app data.
+ * NOTE: This function should be scheduled and called at least a few times a day, or whenever applicable.
  * @param {String} address the address of the user
+ * @return {Object} an object with the tier, claim and deposit status if applicable, else an error is thrown.
  */
 const updateWebAppData = async (address) => {
+    try {
+        const tier = await updateWebAppTier(address);
+        const claim = await updateClaimEligibility(address);
+        const deposit = await updateDepositEligibility(address);
 
+        return {
+            tierStatus: tier,
+            claimStatus: claim,
+            depositStatus: deposit,
+        };
+    } catch (err) {
+        throw err;
+    }
 };
 
 /**
