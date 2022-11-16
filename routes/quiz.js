@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
 
-const { getQuiz } = require('../api/quiz/getQuiz');
+// const { getQuiz } = require('../api/quiz/getQuiz');
 const { getUserStats, uploadScoreToMoralis } = require('../api/quiz/quizStats');
 const httpErrorStatusCode = require('../utils/httpErrorStatusCode');
 
-router.get('/getQuiz', async (req, res) => {
-    try {
-        const quiz = await getQuiz();
-        res.json(quiz);
-    } catch (err) {
-        res
-            .status(httpErrorStatusCode(err.code))
-            .json({ error: err.toString() });
-    }
-});
+// router.get('/getQuiz', async (req, res) => {
+//     try {
+//         const quiz = await getQuiz();
+//         res.json(quiz);
+//     } catch (err) {
+//         res
+//             .status(httpErrorStatusCode(err.code))
+//             .json({ error: err.toString() });
+//     }
+// });
 
 router.get('/getUserStats/:address', async (req, res) => {
     try {
