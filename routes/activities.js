@@ -15,3 +15,6 @@ router.get('/:address', async (req, res) => {
             .json({ error: err.toString() });
     }
 });
+
+module.exports = router;
+
