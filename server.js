@@ -14,6 +14,10 @@ const masterKey = process.env.MORALIS_MASTERKEY;
 app.use(cors());
 app.use(express.json());
 
+const genesisNBMon = require('./routes/genesisNBMon');
+
+app.use('/genesisNBMon', genesisNBMon);
+
 app.listen(port, async () => {
     console.log(`Listening from port ${port}`);
 
