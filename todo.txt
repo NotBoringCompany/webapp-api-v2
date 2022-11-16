@@ -1,7 +1,5 @@
-- add claimingCheck middleware for `claimxRES`.
-- add canDeposit middleware for `depositRES`.
 - talk to alvin to change `ethAddress` to `evmAddress`. once done, change all `ethAddress` fields to `evmAddress` in this codebase.
-- add currency and tier logic + `addUserData` etc from accountLogic.js
+- add  `addUserData` etc from accountLogic.js
 - web app tier logic accepts an ethereum address only for now. if we go with solana etc, we need to accept these addresses as well. probably should add another field in the class in Moralis.
 - talk with jason for the game mechanics since the logic for nbmon and minting will need to be different if there are any blockchain or even game related data.
 - create non hard-coded requirements for the tiers (e.g. rn tier requirements are hardcoded)
