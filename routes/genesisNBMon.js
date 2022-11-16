@@ -21,3 +21,5 @@ router.get('/getGenesisNBMon/:id', async (req, res) => {
     }
 });
 
+
+module.exports = router;
