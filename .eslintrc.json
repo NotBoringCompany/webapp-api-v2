@@ -21,6 +21,7 @@
         "max-len": ["error", { "code": 150 }],
         "camelcase": ["error", {"properties": "never"}],
         "object-curly-spacing": ["error", "always"],
-        "linebreak-style": ["error", "windows"]
+        "linebreak-style": ["error", "windows"],
+        "new-cap": 0
     }
 }

@@ -1,5 +1,4 @@
 const express = require('express');
-/* eslint-disable new-cap */
 const router = express.Router();
 
 const genesisNBMon = require('../api/nfts/genesisNBMon');
