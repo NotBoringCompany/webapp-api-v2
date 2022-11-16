@@ -21,7 +21,7 @@ const { saveHatchingSignature } = require('../webapp/activities.js');
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, '../../abi/GenesisNBMon.json'),
+        path.join(__dirname, '../../abi/genesisNBMon.json'),
     ),
 );
 

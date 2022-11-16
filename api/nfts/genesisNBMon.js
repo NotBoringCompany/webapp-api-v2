@@ -22,7 +22,7 @@ const rpcProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
 // Genesis NBMon contract-related variables
 const genesisABI = JSON.parse(
     fs.readFileSync(
-        path.join(__dirname, '../../abi/GenesisNBMon.json'),
+        path.join(__dirname, '../../abi/genesisNBMon.json'),
     ),
 );
 
