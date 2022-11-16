@@ -15,8 +15,10 @@ app.use(cors());
 app.use(express.json());
 
 const genesisNBMon = require('./routes/genesisNBMon');
+const activities = require('./routes/activities');
 
 app.use('/genesisNBMon', genesisNBMon);
+app.use('/activities', activities);
 
 app.listen(port, async () => {
     console.log(`Listening from port ${port}`);
