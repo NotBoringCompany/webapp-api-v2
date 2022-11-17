@@ -16,6 +16,7 @@ describe('Get Genesis NBMon #1', async () => {
     });
 
     it('Should return an object', async () => {
+        console.log(serverUrl, appid, masterKey);
         expect(nbmon).to.be.an('object');
     });
 
