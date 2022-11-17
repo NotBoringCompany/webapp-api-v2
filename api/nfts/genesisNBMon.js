@@ -445,8 +445,6 @@ const updateGenesisNBMonsByAddress = async (address) => {
     }
 };
 
-updateGenesisNBMonsByAddress('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
-
 /**
  * `changeOwnership` changes the ownership of a Genesis NBMon.
  * NOTE: `safeTransferFrom` NEEDS TO BE CALLED FROM FRONTEND BEFOREHAND!
@@ -741,4 +739,5 @@ module.exports = {
     generalConfig,
     config,
     changeOwnership,
+    updateGenesisNBMonsByAddress,
 };
