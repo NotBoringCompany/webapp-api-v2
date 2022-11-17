@@ -1,17 +1,16 @@
 const { expect } = require('chai');
 const Moralis = require('moralis-v1/node');
-require('dotenv').config();
 
 const genesisNBMon = require('../api/nfts/genesisNBMon');
 
 describe('Get Genesis NBMon #1', async () => {
     let nbmon;
     beforeEach(async () => {
-        // await Moralis.start({
-        //     serverUrl: process.env.MORALIS_SERVERURL,
-        //     appId: process.env.MORALIS_APPID,
-        //     masterKey: process.env.MORALIS_MASTERKEY,
-        // });
+        await Moralis.start({
+            serverUrl: process.env.MORALIS_SERVERURL,
+            appId: process.env.MORALIS_APPID,
+            masterKey: process.env.MORALIS_MASTERKEY,
+        });
         nbmon = await genesisNBMon.getGenesisNBMon(1);
     });
 
