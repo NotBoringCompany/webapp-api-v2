@@ -351,11 +351,6 @@ const getGenesisNBMonAlt = async (id) => {
         throw err;
     }
 };
-
-const serverUrl = process.env.MORALIS_SERVERURL;
-const appId = process.env.MORALIS_APPID;
-const masterKey = process.env.MORALIS_MASTERKEY;
-
 /**
  * `updateGenesisNBMonsByAddress` updates the `MintedNFTs` class with all up to date Genesis NBMons from the blockchain for `address`.
  * This function is mostly called due to errors during minting/hatching which leads to the class not having correct or missing NBMons.
@@ -365,14 +360,6 @@ const masterKey = process.env.MORALIS_MASTERKEY;
  */
 const updateGenesisNBMonsByAddress = async (address) => {
     try {
-        const serverUrl = process.env.MORALIS_SERVERURL;
-        const appId = process.env.MORALIS_APPID;
-        const masterKey = process.env.MORALIS_MASTERKEY;
-        await Moralis.start({
-            serverUrl,
-            appId,
-            masterKey,
-        });
         // we are trying to fetch ALL current Genesis NBMons from the `MintedNFTs` class owned by `address`.
         const MintedNFTs = new Moralis.Query('MintedNFTs');
         MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
