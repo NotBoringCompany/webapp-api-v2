@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { expect } = require('chai');
 const Moralis = require('moralis-v1/node');
 
