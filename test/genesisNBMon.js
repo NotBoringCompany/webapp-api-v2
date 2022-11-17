@@ -1,16 +1,8 @@
-const { expect, should } = require('chai');
-const chaiHttp = require('chai-http');
+const { expect } = require('chai');
 const Moralis = require('moralis-v1/node');
 require('dotenv').config();
 
 const genesisNBMon = require('../api/nfts/genesisNBMon');
-
-// describe('Test 1', () => {
-//     it('should return 1', () => {
-//         const res1 = 1;
-//         expect(res1).to.equal(1);
-//     });
-// });
 
 describe('Get Genesis NBMon #1', async () => {
     let nbmon;
@@ -79,3 +71,21 @@ describe('Get Genesis NBMon #1', async () => {
         expect(nbmon.nbmonId).to.equal(1);
     });
 });
+
+describe('Get Genesis NBMon #1 (alternative)', async () => {
+    beforeEach(async () => {
+        await Moralis.start({
+            serverUrl: process.env.MORALIS_SERVERURL,
+            appId: process.env.MORALIS_APPID,
+            masterKey: process.env.MORALIS_MASTERKEY,
+        });
+        nbmon = await genesisNBMon.getGenesisNBMonAlt(1);
+    });
+
+    it('Should have C#-friendly return values', async () => {
+        expect(nbmon.hatchedAt).to.equal(-1);
+        expect(nbmon.behavior).to.equal('');
+    });
+});
+
+
