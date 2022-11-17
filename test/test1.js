@@ -1,4 +1,5 @@
-const { expect } = require('chai');
+const { expect, should } = require('chai');
+const chaiHttp = require('chai-http');
 
 describe('Test 1', () => {
     it('should return 1', () => {
