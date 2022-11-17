@@ -33,6 +33,10 @@ jobs:
       
       - name: 'Run test'
         run: npm test
+        env:
+          MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
+          MORALIS_APPID: ${{ secrets.MORALIS_APPID }}
+          MORALIS_MASTERKEY: ${{ secrets.MORALIS_MASTERKEY }}
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
