@@ -15,8 +15,11 @@ describe('Get Genesis NBMon #1', async () => {
         nbmon = await genesisNBMon.getGenesisNBMon(1);
     });
 
+    it('Test BSC URL should equal the one in .env', async () => {
+        expect(process.env.BSC_RPC_URL).to.equal('https://data-seed-prebsc-1-s1.binance.org:8545');
+    });
+
     it('Should return an object', async () => {
-        console.log(serverUrl, appid, masterKey);
         expect(nbmon).to.be.an('object');
     });
 
