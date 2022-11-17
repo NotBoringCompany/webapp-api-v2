@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "coverage": "nyc npm run test"
+    "coverage": "nyc npm run test",
+    "make-badges": "istanbul-badges-readme"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,8 @@
   },
   "devDependencies": {
     "chai-http": "^4.3.0",
+    "codecov": "^3.8.3",
+    "coveralls": "^3.1.1",
     "eslint": "^8.24.0",
     "eslint-config-google": "^0.14.0",
     "nyc": "^15.1.0"
