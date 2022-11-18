@@ -42,7 +42,7 @@ jobs:
 
       - name: 'Send to Coveralls'
         run: npm run coverage
-        with:
+        env:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       # - name: Coveralls
       #   uses: coverallsapp/github-action@master
