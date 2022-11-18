@@ -25,9 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # - name: 'Before Script'
-      #   run: chmod 0777 ./node_modules/.bin/mocha
-
       - name: 'Install Mocha'
         run: sudo npm install -g mocha
       
@@ -39,6 +36,8 @@ jobs:
           sudo npm config set user 0
           sudo npm config set unsafe-perm true
           sudo chown -R $USER *
+      - name: 'Create coverage'
+        run: mkdir ./coverage
       
       - name: 'Run test'
         run: sudo npm run mocha-test
