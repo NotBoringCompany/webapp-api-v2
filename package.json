@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test",
-    "mocha-test": "nyc mocha",
+    "test": "mocha test --timeout 10000",
+    "mocha-test": "nyc mocha --timeout 10000",
     "make-badges": "istanbul-badges-readme",
     "pre-ci": "npm run mocha-test && npm run make-badges"
   },
