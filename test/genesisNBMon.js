@@ -92,4 +92,19 @@ describe('Get Genesis NBMon #1 (alternative)', async () => {
     });
 });
 
+// describe('Update Genesis NBMons by address', async () => {
+//     beforeEach(async () => {
+//         await Moralis.start({
+//             serverUrl: process.env.MORALIS_SERVERURL,
+//             appId: process.env.MORALIS_APPID,
+//             masterKey: process.env.MORALIS_MASTERKEY,
+//         });
+//         moralisNBMon = await genesisNBMon.updateGenesisNBMonsByAddress('0x7C1Ec3C1eF675D87Ca9208fe3A4aCa28Ab9eB6e7');
+//     });
+
+//     it('Should return the same values at the end', async () => {
+
+//     });
+// })
+
 

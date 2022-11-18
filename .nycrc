@@ -2,6 +2,7 @@
     "reporter": [
         "html",
         "text",
+        "lcov",
         "json-summary"
     ],
     "check-coverage": true,

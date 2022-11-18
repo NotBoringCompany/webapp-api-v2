@@ -16,6 +16,18 @@ router.get('/getGenesisNBMon/:id', async (req, res) => {
     }
 });
 
+router.post('/updateByAddress', async (req, res) => {
+    try {
+        const { address } = req.body;
+        const update = await genesisNBMon.updateGenesisNBMonsByAddress(address);
+        res.json(update);
+    } catch (err) {
+        res
+            .status(httpErrorStatusCode(err.code))
+            .json({ error: err.toString() });
+    }
+});
+
 router.post('/changeOwnership', async (req, res) => {
     try {
         const { id, toAddress } = req.body;

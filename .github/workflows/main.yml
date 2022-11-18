@@ -24,20 +24,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      # - name: 'Set permissions'
-      #   run: 
-      #     sudo chown -R $USER *
       
       - name: 'Install dependencies'
         run: sudo npm install
       
-      # - name: 'Create coverage'
-      #   run: mkdir coverage
-      
+      # Does not include NYC reporting. That is currently done manually since there is an 
+      # issue with mkdir /coverage.
       - name: 'Run test'
-        run: npm run mocha-test --unsafe-perm=true --allow-root
-        # run: "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage"
+        run: mocha test
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
           MORALIS_APPID: ${{ secrets.MORALIS_APPID }}

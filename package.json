@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "mocha-test": "nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "make-badges": "istanbul-badges-readme"
+    "make-badges": "istanbul-badges-readme",
+    "pre-ci": "npm run mocha-test && npm run make-badges"
   },
   "keywords": [],
   "author": "",
