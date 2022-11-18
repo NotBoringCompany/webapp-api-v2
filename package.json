@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "mocha test",
     "mocha-test": "nyc mocha",
     "make-badges": "istanbul-badges-readme",
     "pre-ci": "npm run mocha-test && npm run make-badges"

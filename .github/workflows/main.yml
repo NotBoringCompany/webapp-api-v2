@@ -28,13 +28,13 @@ jobs:
       - name: 'Install dependencies'
         run: sudo npm install
 
-      - name: 'Install nyc and mocha'
-        run: sudo npm install nyc mocha
+      # - name: 'Install nyc and mocha'
+      #   run: sudo npm install nyc mocha
       
       # Does not include NYC reporting. That is currently done manually since there is an 
       # issue with mkdir /coverage.
       - name: 'Run test'
-        run: mocha test
+        run: npm run test
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
           MORALIS_APPID: ${{ secrets.MORALIS_APPID }}
