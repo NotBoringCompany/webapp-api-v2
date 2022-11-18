@@ -32,7 +32,7 @@ jobs:
         run: sudo npm install
       
       - name: 'Run test'
-        run: sudo nyc mocha
+        run: sudo npm run test
         # run: "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage"
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
