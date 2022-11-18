@@ -380,7 +380,9 @@ const updateGenesisNBMonsByAddress = async (address) => {
         if (parsedNBMons.length !== 0) {
             // if the length of the `ownedNBMons` array is the same as the `parsedNBMons` array from Moralis, then no need to update anything.
             if (ownedNBMons.length === parsedNBMons.length) {
-                return;
+                return {
+                    'status': 'Not changed',
+                };
             // if it isn't the same, then we check which IDs are missing and we update it accordingly.
             } else {
                 // for each id in `ownedNBMons`, we check if `parsedNBMons` from Moralis contains the id. if it doesn't,
