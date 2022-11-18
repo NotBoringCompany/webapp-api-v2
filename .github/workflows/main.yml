@@ -25,18 +25,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: 'Set permissions'
-        run: 
-          sudo chown -R $USER *
+      # - name: 'Set permissions'
+      #   run: 
+      #     sudo chown -R $USER *
       
       - name: 'Install dependencies'
-        run: sudo npm install -g --unsafe-perm=true --allow-root
+        run: sudo npm install
       
       # - name: 'Create coverage'
       #   run: mkdir coverage
       
       - name: 'Run test'
-        run: npm run mocha-test --force
+        run: npm run mocha-test
         # run: "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage"
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
