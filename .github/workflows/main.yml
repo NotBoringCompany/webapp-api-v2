@@ -31,8 +31,13 @@ jobs:
       - name: 'Install dependencies'
         run: sudo npm install
       
+      - name: 'Set permissions'
+        run: 
+          sudo npm config set user 0
+          sudo npm config set unsafe-perm true
+      
       - name: 'Run test'
-        run: sudo npm run test
+        run: sudo npm run mocha-test
         # run: "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage"
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
