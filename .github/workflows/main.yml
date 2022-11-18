@@ -32,7 +32,7 @@ jobs:
         run: npm install
       
       - name: 'Run test'
-        run: npm test
+        run: npm run test
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
           MORALIS_APPID: ${{ secrets.MORALIS_APPID }}
@@ -40,14 +40,10 @@ jobs:
           BSC_RPC_URL: ${{ secrets.BSC_RPC_URL }}
           GENESIS_NBMON_ADDRESS: ${{ secrets.GENESIS_NBMON_ADDRESS }}
 
-      - name: 'Send to Coveralls'
-        run: npm run coverage
-        env:
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Coveralls
-      #   uses: coverallsapp/github-action@master
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
         
       
 
