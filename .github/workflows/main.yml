@@ -41,9 +41,10 @@ jobs:
           GENESIS_NBMON_ADDRESS: ${{ secrets.GENESIS_NBMON_ADDRESS }}
 
       - name: 'Run coverage'
-        run: nyc npm run test
-        
+        run: npm run coverage
+
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
+
