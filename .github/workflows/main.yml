@@ -32,7 +32,7 @@ jobs:
         run: npm install
       
       - name: 'Run test'
-        run: npm run test
+        run: npm run coverage
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}
           MORALIS_APPID: ${{ secrets.MORALIS_APPID }}

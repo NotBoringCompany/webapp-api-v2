@@ -1,0 +1,17 @@
+{
+    "include": [
+        "api/**",
+        "api-calculations/**",
+        "middlewares/**",
+        "routes/**",
+        "utils/**",
+        "server.js"
+    ],
+    "reporter": [
+        "html",
+        "text",
+        "json-summary"
+    ],
+    "check-coverage": true,
+    "temp-directory": "/coverage/tmp"
+}
