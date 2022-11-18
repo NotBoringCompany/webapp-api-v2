@@ -76,20 +76,20 @@ describe('Get Genesis NBMon #1', async () => {
     });
 });
 
-// describe('Get Genesis NBMon #1 (alternative)', async () => {
-//     beforeEach(async () => {
-//         await Moralis.start({
-//             serverUrl: process.env.MORALIS_SERVERURL,
-//             appId: process.env.MORALIS_APPID,
-//             masterKey: process.env.MORALIS_MASTERKEY,
-//         });
-//         nbmon = await genesisNBMon.getGenesisNBMonAlt(1);
-//     });
+describe('Get Genesis NBMon #1 (alternative)', async () => {
+    beforeEach(async () => {
+        await Moralis.start({
+            serverUrl: process.env.MORALIS_SERVERURL,
+            appId: process.env.MORALIS_APPID,
+            masterKey: process.env.MORALIS_MASTERKEY,
+        });
+        nbmon = await genesisNBMon.getGenesisNBMonAlt(1);
+    });
 
-//     it('Should have C#-friendly return values', async () => {
-//         expect(nbmon.hatchedAt).to.equal(-1);
-//         expect(nbmon.behavior).to.equal('');
-//     });
-// });
+    it('Should have C#-friendly return values', async () => {
+        expect(nbmon.hatchedAt).to.equal(-1);
+        expect(nbmon.behavior).to.equal('');
+    });
+});
 
 
