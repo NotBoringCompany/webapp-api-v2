@@ -36,7 +36,7 @@ jobs:
       #   run: mkdir coverage
       
       - name: 'Run test'
-        run: npm run mocha-test
+        run: npm run mocha-test --unsafe-perm=true --allow-root
         # run: "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage"
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}

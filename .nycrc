@@ -4,7 +4,6 @@
         "text",
         "json-summary"
     ],
-    "report-dir": "/coverageFolder",
     "check-coverage": true,
     "temp-dir": "/coverage/tmp"
 }
