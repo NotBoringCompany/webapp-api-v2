@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "mocha-test": "nyc mocha",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "make-badges": "istanbul-badges-readme"
   },
   "keywords": [],
@@ -39,6 +40,7 @@
     "eslint-config-google": "^0.14.0",
     "istanbul-badges-readme": "^1.8.2",
     "mocha-lcov-reporter": "^1.3.0",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "shx": "^0.3.4"
   }
 }

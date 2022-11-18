@@ -25,22 +25,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: 'Set permissions'
+        run: 
+          sudo npm config set unsafe-perm true
+          sudo chown -R $USER *
+
       - name: 'Install Mocha'
         run: sudo npm install -g mocha
       
       - name: 'Install dependencies'
         run: sudo npm install
       
-      - name: 'Set permissions'
-        run: 
-          sudo npm config set user 0
-          sudo npm config set unsafe-perm true
-          sudo chown -R $USER *
       # - name: 'Create coverage'
       #   run: mkdir coverage
       
       - name: 'Run test'
-        run: sudo npm run mocha-test
+        run: npm run mocha-test --force
         # run: "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage"
         env:
           MORALIS_SERVERURL: ${{ secrets.MORALIS_SERVERURL }}

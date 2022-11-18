@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">15.05% </span>
+                <span class="strong">8.6% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/93</span>
+                <span class='fraction'>8/93</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">10.25% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/78</span>
+                <span class='fraction'>0/78</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/10</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">15.38% </span>
+                <span class="strong">8.79% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/91</span>
+                <span class='fraction'>8/91</span>
             </div>
         
             
@@ -376,10 +376,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -491,9 +491,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -646,11 +646,11 @@ const allTypes = [
  * @param {String} secondType is the second type of the NBMon (if not empty/null).
  * @return {Object} an object containing what the NBMon is strong or weak against attack-wise.
  */
-const getAttackEffectiveness = async (firstType, secondType) =&gt; {
-    try {
+const getAttackEffectiveness = <span class="fstat-no" title="function not covered" >as</span>ync (firstType, secondType) =&gt; {
+<span class="cstat-no" title="statement not covered" >    try {</span>
         // we are assuming that if the firstType is undefined or empty, there will also be no secondType.
-        <span class="missing-if-branch" title="else path not taken" >E</span>if (firstType === undefined || firstType === null || firstType === '') {
-            return {
+<span class="cstat-no" title="statement not covered" >        if (firstType === undefined || firstType === null || firstType === '') {</span>
+<span class="cstat-no" title="statement not covered" >            return {</span>
                 'Strong against': [],
                 'Weak against': [],
             };
@@ -761,10 +761,10 @@ const getAttackEffectiveness = async (firstType, secondType) =&gt; {
  * @param {String} secondType is the second type of the NBMon (if not empty/null).
  * @return {Object} an object containing what the NBMon is resistant or vulnerable to defense-wise.
  */
-const getDefenseEffectiveness = async (firstType, secondType) =&gt; {
-    try {
-        <span class="missing-if-branch" title="else path not taken" >E</span>if (firstType === undefined || firstType === null || firstType === '') {
-            return {
+const getDefenseEffectiveness = <span class="fstat-no" title="function not covered" >as</span>ync (firstType, secondType) =&gt; {
+<span class="cstat-no" title="statement not covered" >    try {</span>
+<span class="cstat-no" title="statement not covered" >        if (firstType === undefined || firstType === null || firstType === '') {</span>
+<span class="cstat-no" title="statement not covered" >            return {</span>
                 'Resistant to': [],
                 'Vulnerable to': [],
             };
@@ -883,7 +883,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2022-11-18T12:41:53.615Z
+                at 2022-11-18T14:49:00.019Z
             </div>
         <script src="../prettify.js"></script>
         <script>
