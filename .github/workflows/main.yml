@@ -37,7 +37,7 @@ jobs:
           sudo npm config set unsafe-perm true
           sudo chown -R $USER *
       - name: 'Create coverage'
-        run: mkdir ./coverage
+        run: mkdir coverage
       
       - name: 'Run test'
         run: sudo npm run mocha-test
