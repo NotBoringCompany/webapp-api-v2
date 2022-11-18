@@ -27,14 +27,10 @@ jobs:
 
       - name: 'Set permissions'
         run: 
-          sudo npm config set unsafe-perm true
           sudo chown -R $USER *
-
-      - name: 'Install Mocha'
-        run: sudo npm install -g mocha
       
       - name: 'Install dependencies'
-        run: sudo npm install
+        run: sudo npm install -g --unsafe-perm=true --allow-root
       
       # - name: 'Create coverage'
       #   run: mkdir coverage
