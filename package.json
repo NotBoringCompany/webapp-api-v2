@@ -6,7 +6,7 @@
   "scripts": {
     "test": "nyc mocha",
     "make-badges": "istanbul-badges-readme",
-    "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage"
+    "coverage": "npm test && nyc report --reporter=lcov --report-dir ./coverage | coveralls"
   },
   "keywords": [],
   "author": "",
