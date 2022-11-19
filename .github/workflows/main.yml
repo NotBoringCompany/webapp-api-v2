@@ -41,6 +41,7 @@ jobs:
           MORALIS_MASTERKEY: ${{ secrets.MORALIS_MASTERKEY }}
           BSC_RPC_URL: ${{ secrets.BSC_RPC_URL }}
           GENESIS_NBMON_ADDRESS: ${{ secrets.GENESIS_NBMON_ADDRESS }}
+          TEST_NBMON_OWNER_PRIVATE_KEY: ${{ secrets.TEST_NBMON_OWNER_PRIVATE_KEY }}
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
