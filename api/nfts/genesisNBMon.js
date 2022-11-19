@@ -367,7 +367,7 @@ const updateGenesisNBMonsByAddress = async (address) => {
 
         const nbmons = await MintedNFTs.find({ useMasterKey: true });
 
-        if (nbmons === undefined || nbmons.length === 0) {
+        if (nbmons === undefined) {
             throw new Error('Cannot find Genesis NBMons. Please check Moralis or this code.');
         }
 
@@ -377,14 +377,15 @@ const updateGenesisNBMonsByAddress = async (address) => {
         // first, we check the total NBMons owned by the address from the array of owned IDs' length.
         const ownedNBMons = await getOwnedGenesisNBMonIDs(address);
 
-        if (parsedNBMons.length !== 0) {
-            // if the length of the `ownedNBMons` array is the same as the `parsedNBMons` array from Moralis, then no need to update anything.
-            if (ownedNBMons.length === parsedNBMons.length) {
-                return {
-                    'status': 'Not changed',
-                };
-            // if it isn't the same, then we check which IDs are missing and we update it accordingly.
-            } else {
+        // if the length of the `ownedNBMons` array is the same as the `parsedNBMons` array from Moralis, then no need to update anything.
+        if (ownedNBMons.length === parsedNBMons.length) {
+            return {
+                'status': 'Unchanged',
+            };
+        // if it isn't the same, then we check which IDs are missing and we update it accordingly.
+        } else {
+            // if the address has more owned NBMons in the blockchain than in Moralis, we need to add the missing one(s).
+            if (ownedNBMons.length > parsedNBMons.length) {
                 // for each id in `ownedNBMons`, we check if `parsedNBMons` from Moralis contains the id. if it doesn't,
                 // that means that this id will be queried using `getNFT` and then added to the `MintedNFTs` class.
                 ownedNBMons.forEach(async (id) => {
@@ -421,11 +422,25 @@ const updateGenesisNBMonsByAddress = async (address) => {
                         await mintedNFTs.save(null, { useMasterKey: true });
                     }
                 });
-            }
-        } else {
-            throw new Error('Address does not seem to own any Genesis NBMons');
-        }
+            // if the address has less owned NBMons in the blockchain than in Moralis, we need to remove the extra one(s).
+            } else if (ownedNBMons.length < parsedNBMons.length) {
+                // for each id in `parsedNBMons`, we check if `ownedNBMons` from the blockchain contains the id. if it doesn't,
+                // that means that this id will be removed from the `MintedNFTs` class.
+                parsedNBMons.forEach(async (nbmon) => {
+                    const index = ownedNBMons.findIndex((id) => id === nbmon.tokenId);
+                    if (index === -1) {
+                        // if index is not found, then we remove this id from the `MintedNFTs` class.
+                        const query = new Moralis.Query('MintedNFTs');
+                        query.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
+                        query.equalTo('owner', address);
+                        query.equalTo('tokenId', nbmon.tokenId);
 
+                        const object = await query.first({ useMasterKey: true });
+                        await object.destroy({ useMasterKey: true });
+                    }
+                });
+            }
+        }
         return {
             status: 'OK',
         };
@@ -474,7 +489,8 @@ const changeOwnership = async (nbmonId) => {
 
         // now, we set the owner to the new `blockchainOwner` and save it.
         result.set('owner', blockchainOwner);
-        await result.save(null, { useMasterKey: true });
+        result.set('transferredAt', moment().unix());
+        // await result.save(null, { useMasterKey: true });
 
         return {
             status: 'OK',
@@ -491,12 +507,6 @@ const changeOwnership = async (nbmonId) => {
  */
 const getGenesisNBMonOwner = async (id) => {
     try {
-        await Moralis.start({
-            serverUrl,
-            appId,
-            masterKey,
-        });
-
         const MintedNFTs = new Moralis.Query('MintedNFTs');
         // first we ensure that we are querying for the Genesis NBMons.
         MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
