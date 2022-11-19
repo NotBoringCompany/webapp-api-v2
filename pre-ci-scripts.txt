@@ -1,0 +1,4 @@
+1. run npm run mocha-test/nyc mocha
+2. run npm run make-badges
+Only do 1 & 2 if npm run pre-ci doesn't add the badge.
+3. push to github.

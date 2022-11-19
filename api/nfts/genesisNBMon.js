@@ -444,10 +444,9 @@ const updateGenesisNBMonsByAddress = async (address) => {
  * This ensures that the ownership of the NBMon is changed both in the backend and smart contract level.
  * OTHERWISE: If a player only calls `safeTransferFrom`, there is a risk of ownership discrepancy and information may be altered. Huge risk.
  * @param {Number} nbmonId the Genesis NBMon ID
- * @param {String} toAddress the address to change the ownership to
  * @return {Object} an object with `Status: OK` if successful.
  */
-const changeOwnership = async (nbmonId, toAddress) => {
+const changeOwnership = async (nbmonId) => {
     try {
         // we query the MintedNFTs class in Moralis
         const MintedNFTs = new Moralis.Query('MintedNFTs');
@@ -461,8 +460,20 @@ const changeOwnership = async (nbmonId, toAddress) => {
             throw new Error('Genesis NBMon with given ID not found.');
         }
 
-        // now, we set the owner to the new `toAddress` and save it.
-        result.set('owner', toAddress);
+        const parsedResult = parseJSON(result);
+
+        // now, we check if the current owner in Moralis is the same as the owner in the blockchain.
+        const blockchainOwner = await genesisContract.ownerOf(nbmonId);
+
+        // if the result is the same, we don't have to do anything.
+        if (parsedResult['owner'].toLowerCase() === blockchainOwner.toLowerCase()) {
+            return {
+                status: 'Unchanged',
+            };
+        }
+
+        // now, we set the owner to the new `blockchainOwner` and save it.
+        result.set('owner', blockchainOwner);
         await result.save(null, { useMasterKey: true });
 
         return {

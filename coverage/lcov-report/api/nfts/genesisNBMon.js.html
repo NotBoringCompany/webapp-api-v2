@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">56.74% </span>
+                <span class="strong">56.06% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>185/326</span>
+                <span class='fraction'>185/330</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">39.9% </span>
+                <span class="strong">39.54% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>87/218</span>
+                <span class='fraction'>87/220</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.63% </span>
+                <span class="strong">56.92% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>185/321</span>
+                <span class='fraction'>185/325</span>
             </div>
         
             
@@ -795,7 +795,18 @@
 <a name='L730'></a><a href='#L730'>730</a>
 <a name='L731'></a><a href='#L731'>731</a>
 <a name='L732'></a><a href='#L732'>732</a>
-<a name='L733'></a><a href='#L733'>733</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L733'></a><a href='#L733'>733</a>
+<a name='L734'></a><a href='#L734'>734</a>
+<a name='L735'></a><a href='#L735'>735</a>
+<a name='L736'></a><a href='#L736'>736</a>
+<a name='L737'></a><a href='#L737'>737</a>
+<a name='L738'></a><a href='#L738'>738</a>
+<a name='L739'></a><a href='#L739'>739</a>
+<a name='L740'></a><a href='#L740'>740</a>
+<a name='L741'></a><a href='#L741'>741</a>
+<a name='L742'></a><a href='#L742'>742</a>
+<a name='L743'></a><a href='#L743'>743</a>
+<a name='L744'></a><a href='#L744'>744</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1243,7 +1254,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1256,6 +1266,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1973,10 +1995,9 @@ const updateGenesisNBMonsByAddress = async (address) =&gt; {
  * This ensures that the ownership of the NBMon is changed both in the backend and smart contract level.
  * OTHERWISE: If a player only calls `safeTransferFrom`, there is a risk of ownership discrepancy and information may be altered. Huge risk.
  * @param {Number} nbmonId the Genesis NBMon ID
- * @param {String} toAddress the address to change the ownership to
  * @return {Object} an object with `Status: OK` if successful.
  */
-const changeOwnership = <span class="fstat-no" title="function not covered" >as</span>ync (nbmonId, toAddress) =&gt; {
+const changeOwnership = <span class="fstat-no" title="function not covered" >as</span>ync (nbmonId) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
         // we query the MintedNFTs class in Moralis
         const MintedNFTs = <span class="cstat-no" title="statement not covered" >new Moralis.Query('MintedNFTs');</span>
@@ -1990,8 +2011,20 @@ const changeOwnership = <span class="fstat-no" title="function not covered" >as<
 <span class="cstat-no" title="statement not covered" >            throw new Error('Genesis NBMon with given ID not found.');</span>
         }
 &nbsp;
-        // now, we set the owner to the new `toAddress` and save it.
-<span class="cstat-no" title="statement not covered" >        result.set('owner', toAddress);</span>
+        const parsedResult = <span class="cstat-no" title="statement not covered" >parseJSON(result);</span>
+&nbsp;
+        // now, we check if the current owner in Moralis is the same as the owner in the blockchain.
+        const blockchainOwner = <span class="cstat-no" title="statement not covered" >await genesisContract.ownerOf(nbmonId);</span>
+&nbsp;
+        // if the result is the same, we don't have to do anything.
+<span class="cstat-no" title="statement not covered" >        if (parsedResult['owner'].toLowerCase() === blockchainOwner.toLowerCase()) {</span>
+<span class="cstat-no" title="statement not covered" >            return {</span>
+                status: 'Unchanged',
+            };
+        }
+&nbsp;
+        // now, we set the owner to the new `blockchainOwner` and save it.
+<span class="cstat-no" title="statement not covered" >        result.set('owner', blockchainOwner);</span>
 <span class="cstat-no" title="statement not covered" >        await result.save(null, { useMasterKey: true });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        return {</span>
@@ -2266,7 +2299,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2022-11-18T18:34:14.397Z
+                at 2022-11-19T12:25:26.949Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
