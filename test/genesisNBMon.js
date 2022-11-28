@@ -202,4 +202,69 @@ describe('Get Owned Genesis NBMons', async () => {
     });
 });
 
+describe('Get owned genesis NBMons (alternative)', async () => {
+    let nbmon;
+    beforeEach(async () => {
+        await Moralis.start({
+            serverUrl: process.env.MORALIS_SERVERURL,
+            appId: process.env.MORALIS_APPID,
+            masterKey: process.env.MORALIS_MASTERKEY,
+        });
+        nbmon = await genesisNBMon.getOwnedGenesisNBMonsAlt('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
+    });
+
+    it('Should have the same keys as the Genesis NBMon test', async () => {
+        expect(nbmon[0]).to.have.all.keys(
+            'nbmonId',
+            'owner',
+            'bornAt',
+            'hatchedAt',
+            'isHatchable',
+            'transferredAt',
+            'hatchingDuration',
+            'types',
+            'strongAgainst',
+            'weakAgainst',
+            'resistantTo',
+            'vulnerableTo',
+            'passives',
+            'gender',
+            'rarity',
+            'species',
+            'genus',
+            'mutation',
+            'mutationType',
+            'behavior',
+            'fertility',
+            'fertilityDeduction',
+            'healthPotential',
+            'energyPotential',
+            'attackPotential',
+            'defensePotential',
+            'spAtkPotential',
+            'spDefPotential',
+            'speedPotential',
+            'isEgg',
+            'isListed',
+            'listingData',
+            'currentExp',
+            'level',
+            'nickname',
+            'skillList',
+            'maxHpEffort',
+            'maxEnergyEffort',
+            'speedEffort',
+            'attackEffort',
+            'spAtkEffort',
+            'defenseEffort',
+            'spDefEffort',
+        );
+    });
+
+    it('Should have C# friendly values', async () => {
+        expect(nbmon[0].hatchedAt).to.equal(-1);
+        expect(nbmon[0].behavior).to.equal('');
+    });
+})
+
 
