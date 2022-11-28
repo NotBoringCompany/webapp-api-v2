@@ -37,7 +37,7 @@ const resContract = new ethers.Contract(
 /**
  * `getAllWebAppData` gets all web app related data.
  * @param {String} address the EVM address of the user
- * @return {Object} with all web app related data
+ * @return {Promise<Object>} with all web app related data
  */
 const getAllWebAppData = async (address) => {
     try {
@@ -94,7 +94,7 @@ const getAllWebAppData = async (address) => {
 /**
  * `getRESAllowance` gets the allowance amount of `adminAddress` to spend on behalf of `address`.
  * @param {String} address the EVM address of the user
- * @return {Number} the allowance amount
+ * @return {Promise<Number>} the allowance amount
  */
 const getRESAllowance = async (address) => {
     try {
@@ -109,7 +109,7 @@ const getRESAllowance = async (address) => {
 /**
  * `getPlayfabClaimingData` gets the address and owned xRES of the user.
  * @param {String} playfabId the PlayFab ID of the user
- * @return {Object} an object with the address and owned xRES.
+ * @return {Promise<Object>} an object with the address and owned xRES.
  */
 const getPlayfabClaimingData = async (playfabId) => {
     try {
@@ -169,7 +169,7 @@ const getPlayfabClaimingData = async (playfabId) => {
 /**
  * `getOwnedxRES` gets the owned xRES of the user.
  * @param {String} playfabId the PlayFab ID of the user
- * @return {Float} the owned xRES
+ * @return {Promise<Float>} the owned xRES
  */
 const getOwnedxRES = async (playfabId) => {
     try {
@@ -213,7 +213,7 @@ const getOwnedxRES = async (playfabId) => {
 /**
  * `getOwnedxRESFromAddress` gets the owned xRES of the user from the address.
  * @param {String} address the EVM address of the user
- * @return {Float} the owned xRES
+ * @return {Promise<Float>} the owned xRES
  */
 const getOwnedxRESFromAddress = async (address) => {
     try {
@@ -245,7 +245,7 @@ const getOwnedxRESFromAddress = async (address) => {
 /**
  * `getOwnedRES` gets the owned RES of the user from the blockchain.
  * @param {String} address the EVM address of the user
- * @return {Float} the owned RES
+ * @return {Promise<Float>} the owned RES
  */
 const getOwnedRES = async (address) => {
     try {
@@ -260,7 +260,7 @@ const getOwnedRES = async (address) => {
 /**
  * `userRESTransactions` gets the user's total RES deposited and xRES claimed.
  * @param {String} address the EVM address of the user
- * @return {Object} an object with the total RES deposited and xRES claimed.
+ * @return {Promise<Object>} an object with the total RES deposited and xRES claimed.
  */
 const userRESTransactions = async (address) => {
     try {
@@ -303,6 +303,7 @@ const userRESTransactions = async (address) => {
 /**
  * `getClaimCooldown` gets the claim cooldown time for both xRES and xREC.
  * @param {String} address the EVM address of the user
+ * @return {Promise<Object>} an object with the claim cooldown time for both xRES and xREC.
  */
 const getClaimCooldown = async (address) => {
     try {
@@ -374,7 +375,7 @@ const getClaimCooldown = async (address) => {
  * `claimxRES` converts the user's xRES and mints RES in the blockchain to the user's address (claims it).
  * @param {Float} amount the amount of RES to be claimed
  * @param {String} playfabId the PlayFab ID of the user
- * @return {Object} an object with several status messages if everything is okay.
+ * @return {Promise<Object>} an object with several status messages if everything is okay.
  */
 const claimxRES = async (amount, playfabId) => {
     try {
@@ -524,7 +525,7 @@ const claimxRES = async (amount, playfabId) => {
  * `depositRES` deposits the user's RES for xRES from the blockchain to their playfab accounts.
  * @param {Float} amount the amount of RES to be deposited
  * @param {String} playfabId the PlayFab ID of the user
- * @return {Object} with several status messages if everything is okay.
+ * @return {Promise<Object>} with several status messages if everything is okay.
  */
 const depositRES = async (amount, playfabId) => {
     try {

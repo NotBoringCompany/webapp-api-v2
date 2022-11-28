@@ -43,7 +43,7 @@ const genesisContract = new ethers.Contract(
  * boolMetadata[] = isEgg (1 index)
  *
  * @param {Number} id the ID of the Genesis NBMon to query.
- * @return {Object} a GenesisNBMon object.
+ * @return {Promise<Object>} a GenesisNBMon object.
  */
 const getGenesisNBMon = async (id) => {
     try {
@@ -200,7 +200,7 @@ const getGenesisNBMon = async (id) => {
  * This function will primarily be used for our backend Playfab API which uses C#.
  * C# is static type, meaning that the return values will have to default to -1, '' or 0 instead of `null`, otherwise there will be formatting errors.
  * @param {Number} id the NFT ID
- * @return {Object} a GenesisNBMon object
+ * @return {Promise<Object>} a GenesisNBMon object
  */
 const getGenesisNBMonAlt = async (id) => {
     try {
@@ -356,7 +356,7 @@ const getGenesisNBMonAlt = async (id) => {
  * This function is mostly called due to errors during minting/hatching which leads to the class not having correct or missing NBMons.
  * This function will call `getNFTs` from the blockchain which will check if there are discrepancies between the class' and blockchain's data.
  * @param {String} address the wallet address of the user
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise. If no update is needed, return is empty.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise. If no update is needed, return is empty.
  */
 const updateGenesisNBMonsByAddress = async (address) => {
     try {
@@ -459,7 +459,7 @@ const updateGenesisNBMonsByAddress = async (address) => {
  * This ensures that the ownership of the NBMon is changed both in the backend and smart contract level.
  * OTHERWISE: If a player only calls `safeTransferFrom`, there is a risk of ownership discrepancy and information may be altered. Huge risk.
  * @param {Number} nbmonId the Genesis NBMon ID
- * @return {Object} an object with `Status: OK` if successful.
+ * @return {Promise<Object>} an object with `Status: OK` if successful.
  */
 const changeOwnership = async (nbmonId) => {
     try {
@@ -503,7 +503,7 @@ const changeOwnership = async (nbmonId) => {
 /**
  * `getGenesisNBMonOwner` gets the owner of the Genesis NBMon.
  * @param {Number} id the ID of the Genesis NBMon.
- * @return {string} the address of the owner.
+ * @return {Promise<String>} the address of the owner.
  */
 const getGenesisNBMonOwner = async (id) => {
     try {
@@ -528,7 +528,7 @@ const getGenesisNBMonOwner = async (id) => {
 /**
  * `getOwnedGenesisNBMons` returns all the Genesis NBMons owned by `address`.
  * @param {String} address the address of the owner to query.
- * @return {Array} an array of Genesis NBMons owned by `address`.
+ * @return {Promise<Array>} an array of Genesis NBMons owned by `address`.
  */
 const getOwnedGenesisNBMons = async (address) => {
     try {
@@ -536,10 +536,10 @@ const getOwnedGenesisNBMons = async (address) => {
 
         const nbmons = [];
 
-        ownedIDs.forEach(async (id) => {
-            const nbmon = await getGenesisNBMon(id);
+        for (let i = 0; i < ownedIDs.length; i++) {
+            const nbmon = await getGenesisNBMon(ownedIDs[i]);
             nbmons.push(nbmon);
-        });
+        }
 
         return nbmons;
     } catch (err) {
@@ -550,7 +550,7 @@ const getOwnedGenesisNBMons = async (address) => {
 /**
  * `getOwnedGenesisNBMonsAlt` is an alternative to `getOwnedGenesisNBMons` which utilizes `getGenesisNBMonAlt` to retrieve the NBMons instead.
  * @param {String} address the address of the owner to query.
- * @return {Array} an array of Genesis NBMons owned by `address`.
+ * @return {Promise<Array>} an array of Genesis NBMons owned by `address`.
  */
 const getOwnedGenesisNBMonsAlt = async (address) => {
     try {
@@ -558,10 +558,10 @@ const getOwnedGenesisNBMonsAlt = async (address) => {
 
         const nbmons = [];
 
-        ownedIDs.forEach(async (id) => {
-            const nbmon = await getGenesisNBMonAlt(id);
+        for (let i = 0; i < ownedIDs.length; i++) {
+            const nbmon = await getGenesisNBMonAlt(ownedIDs[i]);
             nbmons.push(nbmon);
-        });
+        }
 
         return nbmons;
     } catch (err) {
@@ -572,7 +572,7 @@ const getOwnedGenesisNBMonsAlt = async (address) => {
 /**
  * `getOwnedGenesisNBMonIDs` returns all the Genesis NBMon IDs owned by `address`.
  * @param {String} address the address of the owner to query.
- * @return {Array} an array of Genesis NBMon IDs owned by `address`.
+ * @return {Promise<Array>} an array of Genesis NBMon IDs owned by `address`.
  */
 const getOwnedGenesisNBMonIDs = async (address) => {
     try {
@@ -580,10 +580,10 @@ const getOwnedGenesisNBMonIDs = async (address) => {
         // since the array from the blockchain will be in `BigNumber` type, we need to parse it to `Number` first.
         const ids = [];
 
-        ownedIDs.forEach((id) => {
-            const convertedID = parseInt(Number(id));
+        for (let i = 0; i < ownedIDs.length; i++) {
+            const convertedID = parseInt(Number(ownedIDs[i]));
             ids.push(convertedID);
-        });
+        }
 
         return ids;
     } catch (err) {
@@ -593,7 +593,7 @@ const getOwnedGenesisNBMonIDs = async (address) => {
 
 /**
  * @dev `generalConfig` shows the supply and time-related configs for the Genesis NBMon contract.
- * @return {Object} returns `supplies` which refer to the supply information for Genesis NBMons and `timestamps` which refer to time-related info.
+ * @return {Promise<Object>} returns `supplies` which refer to the supply info for Genesis NBMons and `timestamps` which refer to time-related info.
  */
 const generalConfig = async () => {
     try {
@@ -637,7 +637,7 @@ const generalConfig = async () => {
  * `config` uses the config info from `generalConfig ` but is specified to one wallet address.
  * this includes the ability for an address to mint, if they have exceeded the mint limit etc (their status)
  * @param {String} address the wallet address of the user
- * @return {Object} the so-called 'status' of the address along with `generalConfig`'s return value.
+ * @return {Promise<Object>} the so-called 'status' of the address along with `generalConfig`'s return value.
  */
 const config = async (address) => {
     try {
@@ -738,6 +738,8 @@ const canMintWhitelisted = (isPublicOpen, isWhitelistOpen, amountMinted, hasMint
     // otherwise, this gets called. (this most likely will never be called)
     return false;
 };
+
+getOwnedGenesisNBMons('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
 
 module.exports = {
     getGenesisNBMon,

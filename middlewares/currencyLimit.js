@@ -9,7 +9,7 @@ const { getWebAppTierBenefits, getClaimingFeeAndLimits } = require('../utils/web
  * `claimingCheck` checks if claim is on cooldown, if the user can claim, and if the claim is within limits.
  * @param {String} currencyToClaim the currency to claim
  * @param {Float} amount the amount of the currency to claim
- * @param {String} playfabId the playfab ID of the user
+ * @param {Promise<String>} playfabId the playfab ID of the user
  */
 const claimingCheck = async (currencyToClaim, amount, playfabId) => {
     try {
@@ -92,7 +92,7 @@ const claimingCheck = async (currencyToClaim, amount, playfabId) => {
 /**
  * `canDeposit` checks if the user is eligible to deposit.
  * @param {String} playfabId the playfab ID of the user
- * @return {Boolean} true if the user can deposit, false if not
+ * @return {Promise<Boolean>} true if the user can deposit, false if not
  */
 const canDeposit = async (playfabId) => {
     try {

@@ -8,7 +8,7 @@ const notionSecret = process.env.NOTION_TOKEN;
 /**
  * `getNBMonData` retrieves the data of the NBMon from our handbuilt Notion database (NBPedia). May include blockchain data.
  * @param {String} genus is the genus of the NBMon (e.g. Lamox, Licorine etc.)
- * @return {Object} an object containing the NBMon's data.
+ * @return {Promise<Object>} an object containing the NBMon's data.
  */
 const getNBMonData = async (genus) => {
     try {

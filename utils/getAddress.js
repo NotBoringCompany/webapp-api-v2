@@ -3,7 +3,7 @@ const axios = require('axios').default;
 /**
  * `getEvmAddress` gets the EVM address of the user from their playfab ID.
  * @param {String} playfabId the PlayFab ID of the user
- * @return {String} the EVM address of the user
+ * @return {Promise<String>} the EVM address of the user
  */
 const getEvmAddress = async (playfabId) => {
     try {

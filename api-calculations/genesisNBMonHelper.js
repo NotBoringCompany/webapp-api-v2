@@ -56,7 +56,7 @@ const getGenesisFertilityDeduction = (rarity) => {
 /**
  * `getBornAt` gets the birth timestamp of a genesis NBMon (in unix time). This method uses blockchain, which will take longer than Moralis.
  * @param {Number} nbmonId the ID of the NBMon
- * @return {Number} the unix birth timestamp of the genesis NBMon.
+ * @return {Promise<Number>} the unix birth timestamp of the genesis NBMon.
  */
 const getBornAt = async (nbmonId) => {
     try {
@@ -74,7 +74,7 @@ const masterKey = process.env.MORALIS_MASTERKEY;
 /**
  * `getBornAt` gets the birth timestamp of a genesis NBMon (in unix time). This method uses Moralis, which results in a faster query.
  * @param {Number} nbmonId the ID of the NBMon
- * @return {Number} the unix birth timestamp of the genesis NBMon.
+ * @return {Promise<Number>} the unix birth timestamp of the genesis NBMon.
  */
 const getBornAtAlt = async (nbmonId) => {
     try {

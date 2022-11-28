@@ -7,7 +7,7 @@ const { parseJSON } = require('../../utils/jsonParser');
  * Note: This ONLY supports our web app. Any NFT purchases or sales in OpenSea are NOT included.
  * @param {String} address the EVM address of the user
  * @param {Number} amount the dollar value of the amount to be increased.
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise.
  */
 const addMonthlyTradingVolume = async (address, amount) => {
     try {
@@ -50,7 +50,7 @@ const addMonthlyTradingVolume = async (address, amount) => {
  * `resetMonthlyTradingVolume` resets the monthly trading volume of `address` back to 0.
  * This function should be called once at the start of every month (1st of each month @ 00:00 GMT).
  * @param {String} address the EVM address of the user
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise.
  */
 const resetMonthlyTradingVolume = async (address) => {
     try {
@@ -79,7 +79,7 @@ const resetMonthlyTradingVolume = async (address) => {
  * This will always be called after a successful sale/purchase.
  * @param {String} address the EVM address of the user
  * @param {Number} amount the dollar value of the amount to be increased.
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise.
  */
 const addTotalTradingVolume = async (address, amount) => {
     try {

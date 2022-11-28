@@ -4,7 +4,7 @@ const { parseJSON } = require('../../utils/jsonParser');
 
 /**
  * `getQuiz` returns a 25-question quiz with their data built initially for Realm Hunter's Discord Bot.
- * @return {Array} An array of quiz data objects.
+ * @return {Promise<Array>} An array of quiz data objects.
  */
 const getQuiz = async () => {
     try {

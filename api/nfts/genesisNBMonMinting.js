@@ -35,18 +35,10 @@ const genesisContract = new ethers.Contract(
  * The NBMon will get stored both in the blockchain (as a source of truth) and the Moralis GenesisNBMons class for faster querying.
  * The NBMon metadata gets stored in DigitalOcean for OpenSea (and other NFT Marketplaces)-friendly metadata retrieval.
  * @param {String} toAddress the address the Genesis NBMon is minted to (aka the owner)
- * @return {Number} the ID of the newly minted Genesis NBMon.
+ * @return {Promise<Number>} the ID of the newly minted Genesis NBMon.
  */
 const publicMint = async (toAddress) => {
     try {
-        const serverUrl = process.env.MORALIS_SERVERURL;
-        const appId = process.env.MORALIS_APPID;
-        const masterKey = process.env.MORALIS_MASTERKEY;
-        await Moralis.start({
-            serverUrl,
-            appId,
-            masterKey,
-        });
         const signer = new ethers.Wallet(privateKey, rpcProvider);
 
         // NBMon related metadata. Note that most of them are empty since they will be replaced when the NBMon is hatched.
@@ -135,14 +127,12 @@ const publicMint = async (toAddress) => {
     }
 };
 
-publicMint('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
-
 /**
  * `whitelistedMint` mints a Genesis NBMon egg (whitelisted minting method).
  * The NBMon will get stored both in the blockchain (as a source of truth) and the Moralis GenesisNBMons class for faster querying.
  * The NBMon metadata gets stored in DigitalOcean for OpenSea (and other NFT Marketplaces)-friendly metadata retrieval.
  * @param {String} toAddress the address the Genesis NBMon is minted to (aka the owner)
- * @return {Number} the ID of the newly minted Genesis NBMon.
+ * @return {Promise<Number>} the ID of the newly minted Genesis NBMon.
  */
 const whitelistedMint = async (toAddress) => {
     try {

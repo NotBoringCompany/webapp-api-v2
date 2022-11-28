@@ -28,7 +28,7 @@ const genesisContract = new ethers.Contract(
  * `updateWebAppData` updates the user's web app data.
  * NOTE: This function should be scheduled and called at least a few times a day, or whenever applicable.
  * @param {String} address the EVM address of the user
- * @return {Object} an object with the tier, claim and deposit status if applicable, else an error is thrown.
+ * @return {Promise<Object>} an object with the tier, claim and deposit status if applicable, else an error is thrown.
  */
 const updateWebAppData = async (address) => {
     try {
@@ -49,7 +49,7 @@ const updateWebAppData = async (address) => {
 /**
  * `updateWebAppTier` updates the user's tier.
  * @param {String} address the EVM address of the user
- * @return {Object} an object with the status, object id and new tier if applicable, else an error is thrown.
+ * @return {Promise<Object>} an object with the status, object id and new tier if applicable, else an error is thrown.
  */
 const updateWebAppTier = async (address) => {
     try {
@@ -142,6 +142,7 @@ const updateWebAppTier = async (address) => {
  * IMPORTANT: ADDITIONALLY, THE USER NEEDS TO HAVE A PLAYFAB ID STORED IN MORALIS TO CLAIM. OTHERWISE, THEY CAN'T.
  * if the checks fail, `canClaim` will return false.
  * @param {String} address the EVM address of the user
+ * @return {Promise<Object>} an object with the claim status and additional info
  */
 const updateClaimEligibility = async (address) => {
     try {
@@ -235,7 +236,7 @@ const updateClaimEligibility = async (address) => {
 /**
  * `updateDepositEligibility` updates the user's deposit eligibility.
  * @param {String} address the EVM address of the user
- * @return {Object} with `depositStatus` and `depositAdditionalInfo`
+ * @return {Promise<Object>} with `depositStatus` and `depositAdditionalInfo`
  */
 const updateDepositEligibility = async (address) => {
     try {
@@ -283,7 +284,7 @@ const updateDepositEligibility = async (address) => {
 /**
  * `getWebAppTier` returns the user's web app tier.
  * @param {String} address the EVM address of the user
- * @return {String} the web app tier
+ * @return {Promise<String>} the web app tier
  */
 const getWebAppTier = async (address) => {
     try {
@@ -312,6 +313,11 @@ const getWebAppTier = async (address) => {
     }
 };
 
+/**
+ * `getNftsOwned` gets the amount of NFTs the user has.
+ * @param {String} address the EVM address of the user
+ * @return {Promise<Number>} the amount of NFTs held
+ */
 const getNftsOwned = async (address) => {
     try {
         let nftsHeld = 0;

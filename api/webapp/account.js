@@ -22,7 +22,7 @@ oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 /**
  * `sendPasswordResetRequest` sends a password reset request to the user's email
  * @param {String} email the user's email
- * @return {Object} the return message with status and message.
+ * @return {Promise<Object>} the return message with status and message.
  */
 const sendPasswordResetRequest = async (email) => {
     const returnMsg = {
@@ -88,7 +88,7 @@ const sendEmail = async (email, tokenId) => {
  * @param {String} tokenId the token ID
  * @param {String} newPassword the new password
  * @param {String} confirmNewPassword confirming the new password
- * @return {Object} the return message with status and message.
+ * @return {Promise<Object>} the return message with status and message.
  */
 const resetPassword = async (tokenId, newPassword, confirmNewPassword) => {
     try {
@@ -128,7 +128,7 @@ const resetPassword = async (tokenId, newPassword, confirmNewPassword) => {
  * 2. Exists in DB.
  * 3. Hasn't expired yet (less than 2 hours old).
  * @param {String} tokenId the token ID
- * @return {Object} an object with `valid` (boolean), and the (user's) `email` (string) if `valid` is `true`.
+ * @return {Promise<Object>} an object with `valid` (boolean), and the (user's) `email` (string) if `valid` is `true`.
  */
 const checkIfTokenValid = async (tokenId) => {
     try {
@@ -159,7 +159,7 @@ const checkIfTokenValid = async (tokenId) => {
  * `createPasswordResetRequest` creates a new record/row in the `ForgotPasswordRequests` class.
  * This record contains all the needed data for resetting a user's password.
  * @param {String} email the user's email
- * @return {String} the token ID
+ * @return {Promise<String>} the token ID
  */
 const createPasswordResetRequest = async (email) => {
     try {
@@ -183,7 +183,7 @@ const createPasswordResetRequest = async (email) => {
 /**
  * `getUser` gets the user object from Moralis.
  * @param {String} email the user's email
- * @return {Object} the user object or null if it doesn't exist
+ * @return {Promise<Object>} the user object or null if it doesn't exist
  */
 const getUser = async (email) => {
     try {
@@ -204,7 +204,7 @@ const getUser = async (email) => {
  * `userLogin` logs the user in
  * @param {String} login the user's login
  * @param {String} password the user's password
- * @return {Object} an object with `status`, `sessionToken` and `userUniqueHash`
+ * @return {Promise<Object>} an object with `status`, `sessionToken` and `userUniqueHash`
  */
 const userLogin = async (login, password) => {
     try {

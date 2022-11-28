@@ -26,7 +26,7 @@ const { parseJSON } = require('../../utils/jsonParser');
  * @param {Number} duration the duration of the sale (in seconds)
  * @param {String} listingType the listing type of the sale (used in FE).
  * This can be `fixedPrice`, `timedAuction`,`absoluteBidding`, `reservedBidding` or `minimumBidding`. Not used for transaction data to the blockchain.
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise.
  */
 const listItem = async (
     nftContract,
@@ -86,7 +86,7 @@ const listItem = async (
  * @param {Boolean} status changes the status of the item to be listed or not listed.
  * @param {String} nftContract the address of the item's NFT contract
  * @param {Number} tokenId the NFT ID
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise.
  */
 const changeIsListedStatus = async (status, nftContract, tokenId) => {
     try {
@@ -118,7 +118,7 @@ const generateTxSalt = () => {
 
 /**
  * `getItemsOnSale` gets all items that are currently on sale in the marketplace.
- * @return {Array} an array of items that are on sale.
+ * @return {Promise<Array>} an array of items that are on sale.
  */
 const getItemsOnSale = async () => {
     try {
@@ -167,7 +167,7 @@ const getItemsOnSale = async () => {
  * NOTE: does NOT change the status of the item on `MintedNFTs`. For this, an extra call to `changeIsListedStatus` is required.
  * @param {String} nftContract the address of the item's NFT contract
  * @param {Number} tokenId the NFT ID
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise.
  */
 const deleteItemOnSale = async (nftContract, tokenId) => {
     try {
@@ -195,7 +195,7 @@ const deleteItemOnSale = async (nftContract, tokenId) => {
  * `getListingData` gets a single item on sale's listing detail/data
  * @param {String} nftContract the address of the item's NFT contract
  * @param {Number} tokenId the NFT ID
- * @return {Object} an item for sale object if query is not empty.
+ * @return {Promise<Object>} an item for sale object if query is not empty.
  */
 const getListingData = async (nftContract, tokenId) => {
     try {
@@ -234,7 +234,7 @@ const getListingData = async (nftContract, tokenId) => {
  * @param {String} nftContract the address of the item's NFT contract
  * @param {Number} tokenId the NFT ID
  * @param {String} purchaserAddress the purchaser's address. this will be the new owner we are trying to set to.
- * @return {Object} an object with 'status: OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with 'status: OK' if successful, or an error thrown otherwise.
  */
 const changeOwnerAndListingStatus = async (nftContract, tokenId, purchaserAddress) => {
     try {
@@ -266,7 +266,7 @@ const changeOwnerAndListingStatus = async (nftContract, tokenId, purchaserAddres
  * This is used since we are going to accommodate more than 1 acceptable payment token (e.g. BUSD, WETH, AVAX, CRO etc).
  * @param {String} nftContract the address of the item's NFT contract
  * @param {Number} tokenId the NFT ID
- * @return {Number} the USD price of the item.
+ * @return {Promise<Number>} the USD price of the item.
  */
 const calculateUsdPrice = async (nftContract, tokenId) => {
     try {

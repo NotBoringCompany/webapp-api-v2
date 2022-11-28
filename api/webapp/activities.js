@@ -16,7 +16,7 @@ const { parseJSON } = require('../../utils/jsonParser');
 /**
  * `getUserActivities` gets a list of activities of `address`.
  * @param {String} address the EVM address of the user.
- * @return {Object} an object with the user's activities.
+ * @return {Promise<Object>} an object with the user's activities.
  */
 const getUserActivities = async (address) => {
     try {
@@ -41,7 +41,7 @@ const getUserActivities = async (address) => {
  * @param {String} nftName the name of the NFT that the signature belongs to. (e.g. `genesisNbmon`).
  * @param {Object} blockchain the blockchain network the hatching happened in.
  * @param {String} signature the signature obtained by calling `hatchingHash` and signing it with the minter's private key.
- * @return {Object} an OK status if the saving is successful.
+ * @return {Promise<Object>} an OK status if the saving is successful.
  */
 const saveHatchingSignature = async (nftName, blockchain, signature) => {
     try {
@@ -70,7 +70,7 @@ const saveHatchingSignature = async (nftName, blockchain, signature) => {
  * 2. this hatching 'event' hasn't been added to the user's activity list yet.
  * this object contains both the `name` and the `chainId` of the network, since some network names are unrecognized by ethers.
  * @param {Object} tx the transaction object of the activity.
- * @return {Object} an object that contains `valid`, `data` and `decodedSignature`.
+ * @return {Promise<Object>} an object that contains `valid`, `data` and `decodedSignature`.
  */
 const checkHatchingSignatureValid = async (tx) => {
     try {
@@ -114,7 +114,7 @@ const checkHatchingSignatureValid = async (tx) => {
  * by changing the `addedToActivities` field to true.
  * This ensures that no same activity can be added more than once.
  * @param {String} signature the hatching signature to be invalidated.
- * @return {Object} an object with an 'OK' status if the invalidation is successful.
+ * @return {Promise<Object>} an object with an 'OK' status if the invalidation is successful.
  */
 const invalidateHatchingSignature = async (signature) => {
     try {
@@ -157,7 +157,7 @@ const invalidateHatchingSignature = async (signature) => {
  * @param {String} toAddress the `to` address for this activity. for hatching/minting, `toAddress` is the owner.
  * @param {Number} tokenId the NFT ID
  * @param {Date} timestamp the activity's block timestamp, converted to date (may not be exactly the same due to code constraints).
- * @return {Object} an object that shows 'OK' if the activity is successfully added and no errors are thrown.
+ * @return {Promise<Object>} an object that shows 'OK' if the activity is successfully added and no errors are thrown.
  */
 /* eslint-enable */
 const addToActivities = async (tx, txType, blockchain, txValue, toAddress, tokenId, timestamp) => {

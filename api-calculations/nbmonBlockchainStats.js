@@ -74,7 +74,7 @@ const randomizeGenesisGenus = () => {
 /**
  * `randomizeGenesisMutation` randomizes the chance for a Genesis NBMon to be mutated. Returns the mutation type if mutated.
  * @param {String} genus the genus of the Genesis NBMon.
- * @return {String} The mutation type of the NBMon if applicable.
+ * @return {Promise<String>} The mutation type of the NBMon if applicable.
  */
 const randomizeGenesisMutation = async (genus) => {
     try {
@@ -211,7 +211,7 @@ const randomizeGenesisPotential = (rarity) => {
 
 /**
  * `randomizePassive` randomizes the passives the Genesis NBMon will obtain.
- * @return {Object} the two passives the Genesis NBMon will obtain.
+ * @return {Promise<Object>} the two passives the Genesis NBMon will obtain.
  */
 const randomizePassives = async () => {
     try {

@@ -37,7 +37,7 @@ const allTypes = [
  * `getAttackEffectiveness` gets the attack effectiveness of the NBMon against other types.
  * @param {String} firstType is the first type of the NBMon.
  * @param {String} secondType is the second type of the NBMon (if not empty/null).
- * @return {Object} an object containing what the NBMon is strong or weak against attack-wise.
+ * @return {Promise<Object>} an object containing what the NBMon is strong or weak against attack-wise.
  */
 const getAttackEffectiveness = async (firstType, secondType) => {
     try {
@@ -152,7 +152,7 @@ const getAttackEffectiveness = async (firstType, secondType) => {
  * NOTE: For this function, please enter the types with proper casing (i.e. Reptile, not reptile, rEpTile, or anything else.)
  * @param {String} firstType is the first type of the NBMon.
  * @param {String} secondType is the second type of the NBMon (if not empty/null).
- * @return {Object} an object containing what the NBMon is resistant or vulnerable to defense-wise.
+ * @return {Promise<Object>} an object containing what the NBMon is resistant or vulnerable to defense-wise.
  */
 const getDefenseEffectiveness = async (firstType, secondType) => {
     try {

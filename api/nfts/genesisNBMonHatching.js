@@ -37,7 +37,7 @@ const genesisContract = new ethers.Contract(
  * @param {Number} nbmonId the ID of the Genesis NBMon
  * @param {String} minter the minter's address
  * @param {Number} bornAt the unix timestamp/block timestamp of when the NBMon was born
- * @return {Object} an object containing both signature and tx salt
+ * @return {Promise<Object>} an object containing both signature and tx salt
  */
 const generateSignature = async (nbmonId, minter, bornAt) => {
     // generates a random salt string from the crypto library, used for hashing.
@@ -65,6 +65,7 @@ const generateSignature = async (nbmonId, minter, bornAt) => {
  * @param {Number} nbmonId the ID of the Genesis NBMon
  * @param {String} txSalt a random salt generated from `crypto.randomBytes` to ensure that the hash is unique.
  * @param {String} signature a bytes32 keccak256 signature obtained from ethers' `signMessage` method.
+ * @return {Promise<Object>} an object containing the mined tx response and the signature
  */
 const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
     try {
@@ -180,7 +181,7 @@ const randomizeHatchingStats = async (nbmonId, txSalt, signature) => {
  * Since previously after the NBMon was minted it gets added to Moralis, we now also
  * need to update the data in Moralis after the NBMon hatches in the blockchain to reflect its new data.
  * @param {Number} nbmonId the ID of the Genesis NBMon
- * @return {Object} an Object that shows 'OK' if the update is successful.
+ * @return {Promise<Object>} an Object that shows 'OK' if the update is successful.
  */
 const updateHatchedNBMon = async (nbmonId) => {
     try {

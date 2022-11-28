@@ -5,7 +5,7 @@ const { parseJSON } = require('../../utils/jsonParser');
 /**
  * `getUserStats` gets the user's quiz stats from the database.
  * @param {String} address the EVM address of the user
- * @return {Object} the user's quiz stats
+ * @return {Promise<Object>} the user's quiz stats
  */
 const getUserStats = async (address) => {
     try {
@@ -42,7 +42,7 @@ const getUserStats = async (address) => {
  * @param {Number} wrongChoices
  * @param {Number} points
  * @param {Number} totalPoints
- * @return {Object} an object with status OK if everything is ok.
+ * @return {Promise<Object>} an object with status OK if everything is ok.
  */
 const uploadScoreToMoralis = async (address, correctChoices, totalCorrectChoices, wrongChoices, points, totalPoints) => {
     try {

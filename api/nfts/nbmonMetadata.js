@@ -68,7 +68,7 @@ const uploadGenesisEggMetadata = (id) => {
  * `uploadGenesisHatchedMetadata` uploads the metadata of a hatched Genesis NBMon to DigitalOcean Spaces.
  * Contains the stats/attributes of the hatched NBMon.
  * @param {Number} id the ID of the Genesis NBMon to upload.
- * @return {Object} an object with a status of 'OK' if successful, or an error thrown otherwise.
+ * @return {Promise<Object>} an object with a status of 'OK' if successful, or an error thrown otherwise.
  */
 const uploadGenesisHatchedMetadata = async (id) => {
     try {

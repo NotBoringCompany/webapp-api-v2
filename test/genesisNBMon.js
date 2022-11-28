@@ -115,7 +115,7 @@ describe('Get Genesis NBMon #1 (alternative)', async () => {
 });
 
 describe('Change ownership', async () => {
-    const idToTransfer = 6;
+    const idToTransfer = 1;
     beforeEach(async () => {
         await Moralis.start({
             serverUrl: process.env.MORALIS_SERVERURL,
@@ -166,9 +166,7 @@ describe('Update Genesis NBMons by address', async () => {
     it('Should not throw', async () => {
         // from previous test, check if both addresses update properly.
         const addr1 = await genesisNBMon.updateGenesisNBMonsByAddress('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
-        const addr2 = await genesisNBMon.updateGenesisNBMonsByAddress('0x213D2806B07fB2BFCd51fCbC7503755784C72F09');
         expect(addr1.status).to.be.oneOf(['Unchanged', 'OK']);
-        expect(addr2.status).to.be.oneOf(['Unchanged', 'OK']);
     });
 });
 
@@ -183,7 +181,24 @@ describe('Get Genesis NBMon Owner', async () => {
 
     it('Should not throw and return the owner of the NBMon', async () => {
         const owner = await genesisNBMon.getGenesisNBMonOwner(1);
-        expect(owner).to.equal('0x8FbFE537A211d81F90774EE7002ff784E352024a');
+        expect(owner).to.equal('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
+    });
+});
+
+describe('Get Owned Genesis NBMons', async () => {
+    beforeEach(async () => {
+        await Moralis.start({
+            serverUrl: process.env.MORALIS_SERVERURL,
+            appId: process.env.MORALIS_APPID,
+            masterKey: process.env.MORALIS_MASTERKEY,
+        });
+    });
+
+    it('Should have proper values and a length of > 0', async () => {
+        const owned = await genesisNBMon.getOwnedGenesisNBMons('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
+        expect(owned).to.be.an('array');
+        expect(owned[0]).to.be.an('object');
+        expect(owned.length).to.be.greaterThan(0);
     });
 });
 
