@@ -172,4 +172,19 @@ describe('Update Genesis NBMons by address', async () => {
     });
 });
 
+describe('Get Genesis NBMon Owner', async () => {
+    beforeEach(async () => {
+        await Moralis.start({
+            serverUrl: process.env.MORALIS_SERVERURL,
+            appId: process.env.MORALIS_APPID,
+            masterKey: process.env.MORALIS_MASTERKEY,
+        });
+    });
+
+    it('Should not throw and return the owner of the NBMon', async () => {
+        const owner = await genesisNBMon.getGenesisNBMonOwner(1);
+        expect(owner).to.equal('0x8FbFE537A211d81F90774EE7002ff784E352024a');
+    });
+});
+
 

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.22% </span>
+                <span class="strong">59.58% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>194/339</span>
+                <span class='fraction'>202/339</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.73% </span>
+                <span class="strong">39.18% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>86/222</span>
+                <span class='fraction'>87/222</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.57% </span>
+                <span class="strong">36.84% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>6/19</span>
+                <span class='fraction'>7/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">58.25% </span>
+                <span class="strong">60.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>194/333</span>
+                <span class='fraction'>202/333</span>
             </div>
         
             
@@ -1324,20 +1324,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2076,21 +2076,21 @@ const changeOwnership = async (nbmonId) =&gt; {
  * @param {Number} id the ID of the Genesis NBMon.
  * @return {string} the address of the owner.
  */
-const getGenesisNBMonOwner = <span class="fstat-no" title="function not covered" >as</span>ync (id) =&gt; {
-<span class="cstat-no" title="statement not covered" >    try {</span>
-        const MintedNFTs = <span class="cstat-no" title="statement not covered" >new Moralis.Query('MintedNFTs');</span>
+const getGenesisNBMonOwner = async (id) =&gt; {
+    try {
+        const MintedNFTs = new Moralis.Query('MintedNFTs');
         // first we ensure that we are querying for the Genesis NBMons.
-<span class="cstat-no" title="statement not covered" >        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);</span>
-<span class="cstat-no" title="statement not covered" >        MintedNFTs.equalTo('tokenId', id);</span>
+        MintedNFTs.equalTo('contractAddress', process.env.GENESIS_NBMON_ADDRESS);
+        MintedNFTs.equalTo('tokenId', id);
 &nbsp;
-        const genesisNBMon = <span class="cstat-no" title="statement not covered" >await MintedNFTs.first({ useMasterKey: true });</span>
+        const genesisNBMon = await MintedNFTs.first({ useMasterKey: true });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (genesisNBMon === undefined) {</span>
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (genesisNBMon === undefined) {
 <span class="cstat-no" title="statement not covered" >            throw new Error('Genesis NBMon with given ID not found in database.');</span>
         }
 &nbsp;
-        const owner = <span class="cstat-no" title="statement not covered" >(parseJSON(genesisNBMon))['owner'];</span>
-<span class="cstat-no" title="statement not covered" >        return owner;</span>
+        const owner = (parseJSON(genesisNBMon))['owner'];
+        return owner;
     } catch (err) {
 <span class="cstat-no" title="statement not covered" >        throw err;</span>
     }
@@ -2329,7 +2329,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2022-11-19T22:22:19.967Z
+                at 2022-11-28T10:54:38.074Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
