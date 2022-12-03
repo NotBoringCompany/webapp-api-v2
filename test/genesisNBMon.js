@@ -265,6 +265,22 @@ describe('Get owned genesis NBMons (alternative)', async () => {
         expect(nbmon[0].hatchedAt).to.equal(-1);
         expect(nbmon[0].behavior).to.equal('');
     });
-})
+});
+
+describe('Get genesis NBMon owner', async () => {
+    let nbmon;
+    beforeEach(async () => {
+        await Moralis.start({
+            serverUrl: process.env.MORALIS_SERVERURL,
+            appId: process.env.MORALIS_APPID,
+            masterKey: process.env.MORALIS_MASTERKEY,
+        });
+        nbmon = await genesisNBMon.getGenesisNBMonOwner(1);
+    });
+
+    it('Should show the correct owner', async () => {
+        expect(nbmon).to.equal('0x2175cF248625c4cBefb204E76f0145b47d9061F8');
+    });
+});
 
 
